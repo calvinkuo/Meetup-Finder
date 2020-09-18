@@ -1,0 +1,15 @@
+Django
+gunicorn
+django-heroku
+asgiref
+beautifulsoup4
+dj-database-url
+django-bootstrap4
+django-crispy-forms
+numpy
+psycopg2
+pytz
+soupsieve
+sqlparse
+whitenoise
+xlrd
