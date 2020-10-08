@@ -8,6 +8,7 @@ django-bootstrap4
 django-crispy-forms
 numpy
 psycopg2
+psycopg2-binary
 pytz
 soupsieve
 sqlparse
