@@ -12,3 +12,4 @@ deploy:
   app: cs3240-project-2-25-new
   on:
     repo: uva-cs3240-f20/project-2-25
+    branch: travis-heroku
