@@ -1,3 +1,10 @@
+language: python
+python:
+- '3.8'
+install:
+- pip install -r requirements.txt
+script:
+- python manage.py migrate
 deploy:
   provider: heroku
   api_key:
@@ -8,3 +15,5 @@ deploy:
   app:
     master: cs3240-project-2-25
     travis-heroku: cs3240-project-2-25-new
+  on:
+    repo: uva-cs3240-f20/project-2-25
