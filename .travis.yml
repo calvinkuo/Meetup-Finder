@@ -13,10 +13,17 @@ script:
   - python manage.py migrate
   - python manage.py test
 deploy:
-  provider: heroku
-  api_key:
-    secure: DagjLJ2nM9qgpZ1DRN5JyxkFf6pBmqTuBO6KlUozayf+nlkn8UGIr7oaD0sK714rw2WKJYEGAFOX/jkgr+ksLakyO0OTt4ir12hsMtiP/3MPhp02vcwzDjs04Dd+wuMMNxwxBuJDOU/ukDtYCi7Vbv2zz6qAd+r4jV1jUSwHgStw1OWy04wY8LtQtdF6b6Eu1kLpYmUq7qCj4NuGlLRvWGKNZIfdvVR1jNK8AuGG7mJp5Z2rFRoHQm71lf9hmgEhBtqoSZumfmQlvflc/cMYYKkT1VoLfDjzqoI4nfpAX5TWjAM9HZ3B3pNHVjHEujdgIFEeMYCzJoyX0H6J28+DlqoD5g6yWrjkfHqlk9oGRpbFg5gPxJmIma+aBNC0gGY9qpfnhWcE0RZSv8PJ1pAqThsVc3elVCjqXW+M+AJtB/B1PNQnFXn3i4axpa7L73epHoR/RiN0qcyH3qh87e114hgsGhH6bUghohEupUpGHtgehNE0fuTJDO3LoOSJerI/Gl9YYWxYgRaoq2og407AgNzRXIl0xYmQBdWhf+6OyvVRxNAimo6tvp/bsPM+7NRpr3YzGBL5pDZkzquDEn5j9JuxCTyTHugoBK8sWZxx3x7Rc9Gbub/Ah8N3OyyNl9NxCyp55wlYei0a3IberS4TtSLm82jXbxxVyTklx5e/JGs=
-  app: cs3240-project-2-25-new
-  on:
-    repo: uva-cs3240-f20/project-2-25
-    branch: travis-heroku
+  - provider: heroku
+    api_key:
+      secure: DagjLJ2nM9qgpZ1DRN5JyxkFf6pBmqTuBO6KlUozayf+nlkn8UGIr7oaD0sK714rw2WKJYEGAFOX/jkgr+ksLakyO0OTt4ir12hsMtiP/3MPhp02vcwzDjs04Dd+wuMMNxwxBuJDOU/ukDtYCi7Vbv2zz6qAd+r4jV1jUSwHgStw1OWy04wY8LtQtdF6b6Eu1kLpYmUq7qCj4NuGlLRvWGKNZIfdvVR1jNK8AuGG7mJp5Z2rFRoHQm71lf9hmgEhBtqoSZumfmQlvflc/cMYYKkT1VoLfDjzqoI4nfpAX5TWjAM9HZ3B3pNHVjHEujdgIFEeMYCzJoyX0H6J28+DlqoD5g6yWrjkfHqlk9oGRpbFg5gPxJmIma+aBNC0gGY9qpfnhWcE0RZSv8PJ1pAqThsVc3elVCjqXW+M+AJtB/B1PNQnFXn3i4axpa7L73epHoR/RiN0qcyH3qh87e114hgsGhH6bUghohEupUpGHtgehNE0fuTJDO3LoOSJerI/Gl9YYWxYgRaoq2og407AgNzRXIl0xYmQBdWhf+6OyvVRxNAimo6tvp/bsPM+7NRpr3YzGBL5pDZkzquDEn5j9JuxCTyTHugoBK8sWZxx3x7Rc9Gbub/Ah8N3OyyNl9NxCyp55wlYei0a3IberS4TtSLm82jXbxxVyTklx5e/JGs=
+    app: cs3240-project-2-25-live
+    on:
+      repo: uva-cs3240-f20/project-2-25
+      branch: master
+  - provider: heroku
+    api_key:
+      secure: DagjLJ2nM9qgpZ1DRN5JyxkFf6pBmqTuBO6KlUozayf+nlkn8UGIr7oaD0sK714rw2WKJYEGAFOX/jkgr+ksLakyO0OTt4ir12hsMtiP/3MPhp02vcwzDjs04Dd+wuMMNxwxBuJDOU/ukDtYCi7Vbv2zz6qAd+r4jV1jUSwHgStw1OWy04wY8LtQtdF6b6Eu1kLpYmUq7qCj4NuGlLRvWGKNZIfdvVR1jNK8AuGG7mJp5Z2rFRoHQm71lf9hmgEhBtqoSZumfmQlvflc/cMYYKkT1VoLfDjzqoI4nfpAX5TWjAM9HZ3B3pNHVjHEujdgIFEeMYCzJoyX0H6J28+DlqoD5g6yWrjkfHqlk9oGRpbFg5gPxJmIma+aBNC0gGY9qpfnhWcE0RZSv8PJ1pAqThsVc3elVCjqXW+M+AJtB/B1PNQnFXn3i4axpa7L73epHoR/RiN0qcyH3qh87e114hgsGhH6bUghohEupUpGHtgehNE0fuTJDO3LoOSJerI/Gl9YYWxYgRaoq2og407AgNzRXIl0xYmQBdWhf+6OyvVRxNAimo6tvp/bsPM+7NRpr3YzGBL5pDZkzquDEn5j9JuxCTyTHugoBK8sWZxx3x7Rc9Gbub/Ah8N3OyyNl9NxCyp55wlYei0a3IberS4TtSLm82jXbxxVyTklx5e/JGs=
+    app: cs3240-project-2-25-new
+    on:
+      repo: uva-cs3240-f20/project-2-25
+      branch: staging
