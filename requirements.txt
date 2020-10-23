@@ -14,3 +14,4 @@ soupsieve
 sqlparse
 whitenoise
 xlrd
+django-address

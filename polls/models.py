@@ -29,6 +29,7 @@ class Choice(models.Model):
 
 
 class Comments(models.Model):
+    organizer = models.CharField(max_length=200)
     name_text = models.CharField(max_length=200)
     comment_text = models.CharField(max_length=1000)
     address = AddressField(on_delete=models.CASCADE)
