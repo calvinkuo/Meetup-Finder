@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
-
+from address.models import AddressField
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
@@ -29,9 +29,10 @@ class Choice(models.Model):
 
 
 class Comments(models.Model):
+    organizer = models.CharField(max_length=200)
     name_text = models.CharField(max_length=200)
     comment_text = models.CharField(max_length=1000)
-
+    address = AddressField(on_delete=models.CASCADE)
     def __str__(self):
         return self.name_text
 

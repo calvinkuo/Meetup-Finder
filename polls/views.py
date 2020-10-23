@@ -3,10 +3,10 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
-
+from address.models import Address
 from .models import Question, Comments
 from .forms import CommentForm
-
+import datetime
 
 class IndexView(generic.ListView):
     template_name = 'polls/index.html'
@@ -32,16 +32,17 @@ class ResultsView(generic.DetailView):
 
 
 def get_comments(request):
+    addresses = Address.objects.all()
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            s = Comments(name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'])
+            s = Comments(organizer = form.cleaned_data['organizer'], name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'], address = Address.objects.last())
             s.save()
-            return HttpResponseRedirect('list/')
+            return render(request, 'polls/comments.html', {'form': form, 'addresses' : addresses})
     else:
-        form = CommentForm()
+        form = CommentForm(initial={'address': Address.objects.last()})
 
-    return render(request, 'polls/comments.html', {'form': form})
+    return render(request, 'polls/comments.html', {'form': form, 'addresses' : addresses})
 
 
 class CommentListView(generic.ListView):
