@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'allauth.account',  
     'allauth.socialaccount',   
     'allauth.socialaccount.providers.google',
+    'address',
 ]
 
 MIDDLEWARE = [
@@ -147,7 +148,7 @@ AUTHENTICATION_BACKENDS = (
 
 SITE_ID = 2
 LOGIN_REDIRECT_URL = '/'
-
+GOOGLE_API_KEY = "AIzaSyAxjY3s7hItHJgmPHwWQG9J50B9ZVgdtdA"
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
