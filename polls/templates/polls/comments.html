@@ -59,7 +59,9 @@
 <div class="text-center">
 <form action="/polls/comments/" method="post">
     {% csrf_token %}
+    {{ form.media }}
     {{ form|crispy }}
+    
     <input type="submit" value="Submit">
 </form>
 </div><br><br><br><br><br><br><br><br>
