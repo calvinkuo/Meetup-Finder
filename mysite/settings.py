@@ -146,7 +146,7 @@ AUTHENTICATION_BACKENDS = (
  'allauth.account.auth_backends.AuthenticationBackend',
  )
 
-SITE_ID = 2
+SITE_ID = 3
 LOGIN_REDIRECT_URL = '/'
 GOOGLE_API_KEY = "AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls"
 SOCIALACCOUNT_PROVIDERS = {
