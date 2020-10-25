@@ -30,9 +30,11 @@ class Choice(models.Model):
 
 class Comments(models.Model):
     organizer = models.CharField(max_length=200)
-    name_text = models.CharField(max_length=200)
-    comment_text = models.CharField(max_length=1000)
+    name= models.CharField(max_length=200)
+    comment = models.CharField(max_length=1000)
     address = AddressField(on_delete=models.CASCADE)
+    event_date = models.DateField(null = True)
+    event_time = models.TimeField(null = True)
     def __str__(self):
         return self.name_text
 
