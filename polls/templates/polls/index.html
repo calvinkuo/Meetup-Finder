@@ -7,15 +7,23 @@
 
 <h1>Events</h1>
 
-{% if latest_question_list %}
+
+{% if comment_list %}
     <ul>
-    {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% for comment in comment_list %}
+        <li><b>Event Name: {{ comment.name }}</b>
+	    <ul>
+	        <li>Details: {{ comment.comment }}</li>
+ 
+            <li>Address: {{ comment.address }}</li>
+
+            <li>Date: {{ comment.event_date }}</li>
+        </ul>
+	</li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>No Events are available.</p>
-{% endif %}
-
+    <p>No comments are available.</p>
+{% endif %}<br><br><br><br><br><br><br><br>
 
 {% endblock %}

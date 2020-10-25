@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="text-center"></div>
-<form action="/polls/comments/" method="post">
+<form method="POST" action="{% url 'polls:comments' %}">{% csrf_token %}
     {% csrf_token %}
     {{ form.media }}
     {{ form|crispy }}

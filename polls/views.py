@@ -36,17 +36,20 @@ def get_comments(request):
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
-            s = Comments(organizer = form.cleaned_data['organizer'], name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'], address = Address.objects.last())
-            s.save()
-            return render(request, 'polls/comments.html', {'form': form, 'addresses' : addresses})
+            post = form.save(commit=False)
+            post.save()
+            return HttpResponseRedirect(reverse('polls:index'))
+            # s = Comments(organizer = form.cleaned_data['organizer'], name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'], address = Address.objects.last())
+            # s.save()
+            # return render(request, 'polls/index.html', {'form': form, 'addresses' : addresses})
     else:
-        form = CommentForm(initial={'address': Address.objects.last()})
+        form = CommentForm()
 
     return render(request, 'polls/comments.html', {'form': form, 'addresses' : addresses})
 
 
 class CommentListView(generic.ListView):
-    template_name = 'polls/commentList.html'
+    template_name = 'polls/index.html'
     context_object_name = 'comment_list'
 
     def get_queryset(self):
