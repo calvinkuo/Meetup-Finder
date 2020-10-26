@@ -74,3 +74,6 @@ def vote(request, question_id):
         # user hits the Back button.
         return HttpResponseRedirect(reverse('meetup_finder:results', args=(question.id,)))
 
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('meetup_finder/account/logout/')

@@ -17,4 +17,5 @@ urlpatterns = [
     path('registration/', views.get_events, name='events'),
     # ex: /meetup_finder/comments/list/
     # path('comments/list/', views.CommentListView.as_view(), name='commentList'),
+    path('account/logout/', views.logout_view, name='logout')
 ]
