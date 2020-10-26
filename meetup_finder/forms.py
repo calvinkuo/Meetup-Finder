@@ -1,9 +1,9 @@
 from django import forms
 from address.forms import AddressField
-from .models import Comments
+from .models import Events
 class CommentForm(forms.ModelForm):
     class Meta: 
-        model = Comments
+        model = Events
         fields = ['organizer', 'name', 'comment', 'address', 'event_date', 'event_time']
         # organizer = forms.CharField(label='Organizer', max_length= 50)
         # name_text = forms.CharField(label='Event Name', max_length=200)
