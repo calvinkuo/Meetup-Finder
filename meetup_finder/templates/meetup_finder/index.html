@@ -8,16 +8,16 @@
 <h1>Events</h1>
 
 
-{% if comment_list %}
+{% if event_list %}
     <ul>
-    {% for comment in comment_list %}
-        <li><b>Event Name: {{ comment.name }}</b>
+    {% for event in event_list %}
+        <li><b>Event Name: {{ events.name }}</b>
 	    <ul>
-	        <li>Details: {{ comment.comment }}</li>
+	        <li>Details: {{ event.comment }}</li>
  
-            <li>Address: {{ comment.address }}</li>
+            <li>Address: {{ event.address }}</li>
 
-            <li>Date: {{ comment.event_date }}</li>
+            <li>Date: {{ event.event_date }}</li>
         </ul>
 	</li>
     {% endfor %}

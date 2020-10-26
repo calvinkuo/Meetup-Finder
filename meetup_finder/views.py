@@ -5,7 +5,7 @@ from django.views import generic
 from django.utils import timezone
 from address.models import Address
 from .models import Question, Events
-from .forms import CommentForm
+from .forms import EventForm
 import datetime
 
 class IndexView(generic.ListView):
@@ -34,7 +34,7 @@ class ResultsView(generic.DetailView):
 def get_events(request):
     addresses = Address.objects.all()
     if request.method == 'POST':
-        form = CommentForm(request.POST)
+        form = EventForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.save()
@@ -43,14 +43,14 @@ def get_events(request):
             # s.save()
             # return render(request, 'meetup_finder/index.html', {'form': form, 'addresses' : addresses})
     else:
-        form = CommentForm()
+        form = EventForm()
 
     return render(request, 'meetup_finder/registration.html', {'form': form, 'addresses' : addresses})
 
 
-class CommentListView(generic.ListView):
+class EventListView(generic.ListView):
     template_name = 'meetup_finder/index.html'
-    context_object_name = 'comment_list'
+    context_object_name = 'event_list'
 
     def get_queryset(self):
         return Events.objects.all()

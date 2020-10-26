@@ -6,7 +6,7 @@ from . import views
 app_name = 'meetup_finder'
 urlpatterns = [
     # ex: /meetup_finder/
-    path('', views.CommentListView.as_view(), name='index'),
+    path('', views.EventListView.as_view(), name='index'),
     # ex: /meetup_finder/5/
     path('<int:pk>/', views.DetailView.as_view(), name='detail'),
     # ex: /meetup_finder/5/results/

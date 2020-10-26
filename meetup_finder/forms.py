@@ -1,7 +1,7 @@
 from django import forms
 from address.forms import AddressField
 from .models import Events
-class CommentForm(forms.ModelForm):
+class EventForm(forms.ModelForm):
     class Meta: 
         model = Events
         fields = ['organizer', 'name', 'comment', 'address', 'event_date', 'event_time']

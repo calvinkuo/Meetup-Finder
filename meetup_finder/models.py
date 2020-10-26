@@ -39,3 +39,11 @@ class Events(models.Model):
 
     def __str__(self):
         return self.name
+
+class Response(models.Model):
+    event = models.ForeignKey(Events, on_delete = models.CASCADE)
+    response_text = models.CharField(max_length=50)
+    votes = models.IntegerField(default = 0)
+
+    def __str__(self):
+        return self.response_text
