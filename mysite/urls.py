@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name="meetup_finder/index.html")),
+    path('', RedirectView.as_view(url="meetup_finder/")),
     path('meetup_finder/', include('meetup_finder.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
