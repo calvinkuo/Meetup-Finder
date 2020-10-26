@@ -4,12 +4,12 @@ from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
 from address.models import Address
-from .models import Question, Comments
+from .models import Question, Events
 from .forms import CommentForm
 import datetime
 
 class IndexView(generic.ListView):
-    template_name = 'polls/index.html'
+    template_name = 'meetup_finder/index.html'
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
@@ -20,7 +20,7 @@ class IndexView(generic.ListView):
 
 class DetailView(generic.DetailView):
     model = Question
-    template_name = 'polls/detail.html'
+    template_name = 'meetup_finder/detail.html'
 
     def get_queryset(self):
         return Question.objects.filter(pub_date__lte=timezone.now())
@@ -28,32 +28,32 @@ class DetailView(generic.DetailView):
 
 class ResultsView(generic.DetailView):
     model = Question
-    template_name = 'polls/results.html'
+    template_name = 'meetup_finder/results.html'
 
 
-def get_comments(request):
+def get_events(request):
     addresses = Address.objects.all()
     if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
             post.save()
-            return HttpResponseRedirect(reverse('polls:index'))
+            return HttpResponseRedirect(reverse('meetup_finder:index'))
             # s = Comments(organizer = form.cleaned_data['organizer'], name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'], address = Address.objects.last())
             # s.save()
-            # return render(request, 'polls/index.html', {'form': form, 'addresses' : addresses})
+            # return render(request, 'meetup_finder/index.html', {'form': form, 'addresses' : addresses})
     else:
         form = CommentForm()
 
-    return render(request, 'polls/comments.html', {'form': form, 'addresses' : addresses})
+    return render(request, 'meetup_finder/registration.html', {'form': form, 'addresses' : addresses})
 
 
 class CommentListView(generic.ListView):
-    template_name = 'polls/index.html'
+    template_name = 'meetup_finder/index.html'
     context_object_name = 'comment_list'
 
     def get_queryset(self):
-        return Comments.objects.all()
+        return Events.objects.all()
 
 
 def vote(request, question_id):
@@ -62,7 +62,7 @@ def vote(request, question_id):
         selected_choice = question.choice_set.get(pk=request.POST['choice'])
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        return render(request, 'polls/detail.html', {
+        return render(request, 'meetup_finder/detail.html', {
             'question': question,
             'error_message': "You didn't select a choice.",
         })
@@ -72,5 +72,5 @@ def vote(request, question_id):
         # Always return an HttpResponseRedirect after successfully dealing
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
-        return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+        return HttpResponseRedirect(reverse('meetup_finder:results', args=(question.id,)))
 

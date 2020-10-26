@@ -29,7 +29,7 @@ class Choice(models.Model):
         return self.choice_text
 
 
-class Comments(models.Model):
+class Events(models.Model):
     organizer = models.CharField(max_length=200)
     name = models.CharField("Event Name", max_length=200)
     comment = models.CharField("Details", max_length=1000)

@@ -29,7 +29,7 @@
 
         <ul class="list-unstyled">
           <li>
-            <a href="/polls/comments/">Comments</a>
+            <a href="/meetup_finder/comments/">Comments</a>
           </li>
         </ul>
 
@@ -43,7 +43,7 @@
 
         <ul class="list-unstyled">
           <li>
-            <a href="/polls/comments/list/">Comment List</a>
+            <a href="/meetup_finder/comments/list/">Comment List</a>
           </li>
       </div>
       <!-- Grid column -->
@@ -60,7 +60,7 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'polls:vote' question.id %}" method="post">
+<form action="{% url 'meetup_finder:vote' question.id %}" method="post">
 {% csrf_token %}
 {% for choice in question.choice_set.all %}
     <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
@@ -98,7 +98,7 @@
 
         <ul class="list-unstyled">
           <li>
-            <a href="/polls/comments/">Comments</a>
+            <a href="/meetup_finder/comments/">Comments</a>
           </li>
         </ul>
 
@@ -113,7 +113,7 @@
 
         <ul class="list-unstyled">
           <li>
-            <a href="/polls/comments/list/">Comment List</a>
+            <a href="/meetup_finder/comments/list/">Comment List</a>
           </li>
       </div>
       <!-- Grid column -->
