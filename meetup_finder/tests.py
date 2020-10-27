@@ -88,7 +88,7 @@ class EventsResponseVoteTests(TestCase):
                      name="Test Event Name",
                      comment="Test Event Details",  # event details
                      address="Test Address")
-        response = self.client.get(reverse('meetup_finder:detail'))
+        response = self.client.get(reverse('meetup_finder:detail', args=(self.id, )))
         self.assertContains(response, "Going")
         self.assertContains(response, "Not Going")
         self.assertContains(response, "Maybe")
