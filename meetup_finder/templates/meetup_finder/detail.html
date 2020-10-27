@@ -4,17 +4,28 @@
 
 {% block content %}
 
-<h1>{{ question.question_text }}</h1>
+<h1>{{ event.name}}</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
-<form action="{% url 'meetup_finder:vote' question.id %}" method="post">
+<form action="{% url 'meetup_finder:vote' event.pk %}" method="post">
 {% csrf_token %}
-{% for choice in question.choice_set.all %}
-    <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-    <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+{% for response in event.response_set.all %}
+    <input type="radio" name="response" id="response{{ forloop.counter }}" value="{{ response.id }}">
+    <label for="response{{ forloop.counter }}">{{ response.response_text }}</label><br>
 {% endfor %}
-<input type="submit" value="Vote">
-
-
+<input type="submit" value="Respond">
+</form>
+<div id="content", name="content", class="main">
+    <div class="row justify-content-center">
+        <div class="col-8">
+            <hr class ="mt-0 mb-4">
+                <ul>
+                {% for response in event.response_set.all %}
+                    <li>{{ response.response_text }} -- {{ response.votes }} vote{{ response.votes|pluralize }}</li>
+                {% endfor %}
+                </ul>
+        </div>
+      </div>
+  </div>
 {% endblock %}

@@ -12,7 +12,7 @@ urlpatterns = [
     # ex: /meetup_finder/5/results/
     path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
     # ex: /meetup_finder/5/vote/
-    path('<int:question_id>/vote/', views.vote, name='vote'),
+    path('<int:event_id>/vote/', views.vote, name='vote'),
     # ex: /meetup_finder/comments/
     path('registration/', views.get_events, name='events'),
     # ex: /meetup_finder/comments/list/
