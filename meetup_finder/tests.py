@@ -78,3 +78,9 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Address")
         self.assertContains(response, "Event date")
         self.assertContains(response, "Event time")
+
+# class EventsResponseVoteTests(TestCase):
+#     def test_single_event(self):
+#         """
+#         Check that Response is made for Event created
+#         """
