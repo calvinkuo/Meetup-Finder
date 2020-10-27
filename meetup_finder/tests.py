@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.utils import timezone
 from django.urls import reverse
 
-from .models import Events
+from .models import Events, Response
 
 
 def create_event(organizer="", name="", comment="", address="", days=0):
@@ -29,7 +29,7 @@ class EventsIndexViewTests(TestCase):
         response = self.client.get(reverse('meetup_finder:index'))  # the list of events
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No events are available.")
-        self.assertQuerysetEqual(response.context['comment_list'], [])  # the list of events
+        self.assertQuerysetEqual(response.context['event_list'], [])  # the list of events
 
     def test_single_event(self):
         """
@@ -79,8 +79,16 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Event date")
         self.assertContains(response, "Event time")
 
-# class EventsResponseVoteTests(TestCase):
-#     def test_single_event(self):
-#         """
-#         Check that Response is made for Event created
-#         """
+class EventsResponseVoteTests(TestCase):
+    def test_response_vote(self):
+        """
+        Check that Response is made for Event created
+        """
+        create_event(organizer="Test Organizer",
+                     name="Test Event Name",
+                     comment="Test Event Details",  # event details
+                     address="Test Address")
+        response = self.client.get(reverse('meetup_finder:detail'))
+        self.assertContains(response, "Going")
+        self.assertContains(response, "Not Going")
+        self.assertContains(response, "Maybe")
