@@ -28,4 +28,9 @@
         </div>
       </div>
   </div>
+<form action="{% url 'meetup_finder:event_delete' event.pk %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Delete Event">
+</form>
 {% endblock %}
+

@@ -1,5 +1,5 @@
 from django.urls import path
-
+from django.conf.urls import url
 from . import views
 
 
@@ -17,5 +17,6 @@ urlpatterns = [
     path('registration/', views.get_events, name='events'),
     # ex: /meetup_finder/comments/list/
     # path('comments/list/', views.CommentListView.as_view(), name='commentList'),
-    path('account/logout/', views.logout_view, name='logout')
+    path('account/logout/', views.logout_view, name='logout'),
+    url(r'^delete/(?P<pk>[0-9]+)/$', views.event_delete, name='event_delete')
 ]

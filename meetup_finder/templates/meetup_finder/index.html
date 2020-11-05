@@ -7,23 +7,30 @@
 
 <h1>Events</h1>
 
-
 {% if event_list %}
-    <ul>
-    {% for event in event_list %}
-        <li><b><a href="{% url 'meetup_finder:detail' event.pk %}">Event Name: {{ event.name }}</a></b>
-	    <ul>
-	        <li>Details: {{ event.comment }}</li>
- 
+{% for event in event_list %}
+<div class="row">
+    <div class="col-sm-3">
+        <div class="well">
+            <p><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></p>
+        </div>
+    </div>
+    <div class="col-sm-9">
+    <div class="well">
+        <ul>
+            <li>Organizer: {{ event.organizer }}</li>
+            <li>Details: {{ event.comment }}</li>
             <li>Address: {{ event.address }}</li>
-
             <li>Date: {{ event.event_date }}</li>
+
         </ul>
-	</li>
-    {% endfor %}
-    </ul>
+
+   </div>
+ </div>
+</div>
+{% endfor %}
 {% else %}
     <p>No events are available.</p>
 {% endif %}<br><br><br><br><br><br><br><br>
 
-{% endblock %}
+{% endblock %}<br><br><br><br><br><br><br><br>
