@@ -1,82 +1,61 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <title>PathFinder</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    <title>PathFinder</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>    
+      /* Set black background color, white text and some padding */
+      footer {
+        background-color: #555;
+        color: white;
+        padding: 15px;
+      }
+    </style>
   </head>
   <body>
+    <nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>                        
+          </button>
+          <a class="navbar-brand">PathFinder</a>
+        </div>
+        <div class="collapse navbar-collapse" id="myNavbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+            {% load socialaccount %}
+            {% if user.is_authenticated %}
+            <li><a href="/meetup_finder/registration/"> Create Event</a></li>
+            <p style="color:white">Welcome, {{ user.username }} </p>
+
+            {% endif %}
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            {% if user.is_authenticated %}
+            <li><a href="/accounts/logout"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+            {% else %}
+            <li><a href="{% provider_login_url 'google' %}"><span class="glyphicon glyphicon-user"></span> Login with Google</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-8">
-          <h1 class="mt-2">PathFinder</h1>
-          {% load socialaccount %}
-          {% if user.is_authenticated %}
-          <p>Welcome, {{ user.username }} !</p>
-          <a href="/accounts/logout">Logout</a>
-
-          {% else %}
-          <a href="{% provider_login_url 'google' %}">Login with Google</a>
-          {% endif %}
-          <hr class="mt-0 mb-4">
-          <div class="pb-2 mt-4 mb-2 border-bottom text_center">
-            <!-- Footer Links -->
-          <div class="container-fluid text-center text-md-left">
-        
-            <!-- Grid row -->
-            <div class="row">
-        
-              <!-- Grid column -->
-              <div class="col-md-6 mt-md-0 mt-3">
-        
-                <!-- Content -->
-                <p><b>Navigation</b></p>
-        
-              </div>
-              <!-- Grid column -->
-        
-              <hr class="clearfix w-100 d-md-none pb-3">
-        
-              <!-- Grid column -->
-              <div class="col-md-3 mb-md-0 mb-3">
-        
-                <!-- Links -->
-        
-                <ul class="list-unstyled">
-                  <li>
-                    <a href="/meetup_finder">Home</a>
-                    
-                    
-                  </li>
-                </ul>
-        
-              </div>
-              <!-- Grid column -->
-        
-              <!-- Grid column -->
-              <div class="col-md-3 mb-md-0 mb-3">
-        
-                <!-- Links -->
-        
-                <ul class="list-unstyled">
-                  <li>
-                    <a href="/meetup_finder/registration/">Create Event</a>
-                  </li>
-                </ul>
-              </div>
-              <!-- Grid column -->
-        
-            </div>
-            <!-- Grid row -->
-        
-          </div>
-          <!-- Footer Links -->
-        
-        </div>
+          
           {% block content %}
           {% endblock %}
-
+        </div>
+      </div>
+    </div>
 
 
         </form><br><br><br><br><br><br><br><br>
@@ -93,8 +72,8 @@
               <div class="col-md-6 mt-md-0 mt-3">
         
                 <!-- Content -->
-                <h5 class="text-uppercase">Footer Content</h5>
-                <p>Header and Footer code based off of mdbootstrap.com</p>
+                <h5 class="text-uppercase">About Us</h5>
+                <p>Web Page to create events and respond to events</p>
         
               </div>
               <!-- Grid column -->
@@ -106,13 +85,13 @@
         
                 <!-- Links -->
                 <h5 class="text-uppercase">Links</h5>
-        
+                {% if user.is_authenticated %}
                 <ul class="list-unstyled">
                   <li>
                     <a href="/meetup_finder/comments/">Create Event</a>
                   </li>
                 </ul>
-        
+                {% endif %}
               </div>
               <!-- Grid column -->
         

@@ -1,13 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
+from django.contrib.auth.decorators import permission_required,user_passes_test
 from address.models import Address
 from .models import Question, Events, Response
 from .forms import EventForm
 import datetime
-
+from django.contrib.auth.models import Permission
 class IndexView(generic.ListView):
     template_name = 'meetup_finder/results.html'
     context_object_name = 'latest_question_list'
@@ -53,6 +54,8 @@ def get_events(request):
         form = EventForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
+            permission = Permission.objects.get(codename='can_delete')
+            request.user.user_permissions.add(permission)
             post.save()
             post.response_set.create(response_text = 'Going', votes = 0)
             post.response_set.create(response_text = 'Not Going', votes = 0)
@@ -66,7 +69,6 @@ def get_events(request):
 
     return render(request, 'meetup_finder/registration.html', {'form': form, 'addresses' : addresses})
 
-
 class EventListView(generic.ListView):
     template_name = 'meetup_finder/index.html'
     context_object_name = 'event_list'
@@ -74,7 +76,17 @@ class EventListView(generic.ListView):
     def get_queryset(self):
         return Events.objects.filter(event_date__gte = timezone.now())
 
+# @user_passes_test(lambda u: u.is_allowed_to_see_view_event_delete())
+def event_delete(request, pk):
+    event = get_object_or_404(Events, pk=pk)  # Get your current cat
+    if request.method == 'POST':         # If method is POST,
+        if request.user.has_perm('meetup_finder.can_delete'):
+            event.delete()                     # delete the cat.
+            return redirect('/')             # Finally, redirect to the homepage.
+        else:
+            return HttpResponse("You don't have access to delete this event")
 
+    return render(request, 'index.html', {'event': event})
 
 
 def logout_view(request):
