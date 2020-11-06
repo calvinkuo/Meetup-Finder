@@ -86,7 +86,7 @@ def event_delete(request, pk):
         else:
             return HttpResponse("You don't have access to delete this event")
 
-    return render(request, 'index.html', {'event': event})
+    return render(request, 'meetup_finder/index.html', {'event': event})
 
 
 def logout_view(request):

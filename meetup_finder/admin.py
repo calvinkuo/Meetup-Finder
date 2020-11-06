@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import Choice, Question
-
+from .models import Choice, Question, Events, Response
+from django.conf import settings
 
 class ChoiceInline(admin.TabularInline):
     model = Choice
@@ -19,5 +19,16 @@ class QuestionAdmin(admin.ModelAdmin):
     search_fields = ['question_text']
 
 
-admin.site.register(Question, QuestionAdmin)
-admin.site.register(Choice)
+class ResponseInline(admin.TabularInline):
+    model = Response
+
+
+class EventsAdmin(admin.ModelAdmin):
+    inlines = [ResponseInline]
+    extra = 0
+
+
+# admin.site.register(Question, QuestionAdmin)
+# admin.site.register(Choice)
+admin.site.register(Events, EventsAdmin)
+# admin.site.register(Response)

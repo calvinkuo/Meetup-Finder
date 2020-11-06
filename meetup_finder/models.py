@@ -4,6 +4,8 @@ from django.db import models
 from django.utils import timezone
 from address.models import AddressField
 from django.conf import settings
+
+
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     pub_date = models.DateTimeField('date published')
@@ -37,6 +39,7 @@ class Events(models.Model):
     event_date = models.DateField(null=True)
     event_time = models.TimeField(null=True)
     class Meta:
+        verbose_name_plural = "Events"
         permissions = (
             ('can_delete', 'Can delete event'),
         )
