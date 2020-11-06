@@ -22,6 +22,14 @@
             <li>Details: {{ event.comment }}</li>
             <li>Address: {{ event.address }}</li>
             <li>Date: {{ event.event_date }}</li>
+			 <iframe
+  width="600"
+  height="300"
+  frameborder="0" style="border:0"
+  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
+    &q={{ event.address }}" allowfullscreen>
+</iframe>
+
 
         </ul>
 
