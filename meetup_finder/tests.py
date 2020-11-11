@@ -18,6 +18,7 @@ def create_event(organizer="", name="", comment="", address="", days=0):
                                  name=name,
                                  comment=comment,  # event details
                                  address=address,
+                                 geolocation="0,0",
                                  event_date=time.date().isoformat(),
                                  event_time=time.time().isoformat())
 
@@ -79,6 +80,7 @@ def login_and_add_event(self):
         'name': "Test Event Name",
         'comment': "Test Event Details",
         'address': "Test Address",
+        'geolocation': "0,0",
         'event_date': "12/1/2020",
         'event_time': "1:00",
         'user': self.user
