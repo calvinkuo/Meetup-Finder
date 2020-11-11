@@ -1,10 +1,18 @@
 from django import forms
 from address.forms import AddressField
+from django_google_maps import widgets as map_widgets
+from django_google_maps import fields as map_fields
 from .models import Events
+
+
 class EventForm(forms.ModelForm):
     class Meta: 
         model = Events
-        fields = ['organizer', 'name', 'comment', 'address', 'event_date', 'event_time']
+        fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address', 'geolocation']
+        widgets = {
+            'address': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'}),
+            'geolocation': forms.HiddenInput(),
+        }
         # organizer = forms.CharField(label='Organizer', max_length= 50)
         # name_text = forms.CharField(label='Event Name', max_length=200)
         # comment_text = forms.CharField(label='Description', max_length=1000)

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',   
     'allauth.socialaccount.providers.google',
     'address',
+    'django_google_maps',
 ]
 
 MIDDLEWARE = [
@@ -147,7 +148,7 @@ AUTHENTICATION_BACKENDS = (
 
 SITE_ID = 3
 LOGIN_REDIRECT_URL = '/'
-GOOGLE_API_KEY = "AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls"
+GOOGLE_API_KEY = GOOGLE_MAPS_API_KEY = "AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls"
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [

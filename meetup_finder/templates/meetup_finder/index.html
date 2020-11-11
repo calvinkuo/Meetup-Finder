@@ -9,7 +9,7 @@
 
 {% if event_list %}
 {% for event in event_list %}
-<div class="row">
+<div class="row" data-geolocation="{{event.geolocation}}">
     <div class="col-sm-3">
         <div class="well">
             <p><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></p>
@@ -22,17 +22,16 @@
             <li>Details: {{ event.comment }}</li>
             <li>Address: {{ event.address }}</li>
             <li>Date: {{ event.event_date }}</li>
-			 <iframe
-  width="600"
-  height="300"
-  frameborder="0" style="border:0"
-  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
-    &q={{ event.address }}" allowfullscreen>
-</iframe>
-
-
         </ul>
-
+        <div class="map_container">
+            <iframe class="map"
+                width="600"
+                height="300"
+                frameborder="0"
+                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
+                &q={{ event.address }}" allowfullscreen>
+            </iframe>
+        </div>
    </div>
  </div>
 </div>

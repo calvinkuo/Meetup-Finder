@@ -1,7 +1,9 @@
 from django.contrib import admin
+from django_google_maps import widgets as map_widgets
+from django_google_maps import fields as map_fields
+from django.conf import settings
 
 from .models import Choice, Question, Events, Response
-from django.conf import settings
 
 class ChoiceInline(admin.TabularInline):
     model = Choice
@@ -26,6 +28,9 @@ class ResponseInline(admin.TabularInline):
 class EventsAdmin(admin.ModelAdmin):
     inlines = [ResponseInline]
     extra = 0
+    formfield_overrides = {
+        map_fields.AddressField: {'widget': map_widgets.GoogleMapsAddressWidget},
+    }
 
 
 # admin.site.register(Question, QuestionAdmin)
