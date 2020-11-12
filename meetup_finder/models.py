@@ -5,7 +5,7 @@ from django.utils import timezone
 # from address.models import AddressField
 from django_google_maps import fields as map_fields
 from django.conf import settings
-
+from django.contrib.auth.models import User
 
 # class Question(models.Model):
 #     question_text = models.CharField(max_length=200)
@@ -69,3 +69,12 @@ class Response(models.Model):
 
     def __str__(self):
         return self.response_text
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField("First and Last Name", max_length=200,)
+    bio = models.CharField("BIO", max_length = 500)
+    birthday = models.DateField("Birthday",null=True)
+
+    def __str__(self):
+        return f'{self.user.username} Profile'

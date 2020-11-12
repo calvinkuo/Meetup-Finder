@@ -3,7 +3,7 @@ from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from django.conf import settings
 
-from .models import Events, Response
+from .models import Events, Response, Profile
 
 
 # class ChoiceInline(admin.TabularInline):
@@ -37,4 +37,5 @@ class EventsAdmin(admin.ModelAdmin):
 # admin.site.register(Question, QuestionAdmin)
 # admin.site.register(Choice)
 admin.site.register(Events, EventsAdmin)
+admin.site.register(Profile)
 # admin.site.register(Response)

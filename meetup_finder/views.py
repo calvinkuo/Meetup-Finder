@@ -7,7 +7,9 @@ from django.utils import timezone
 # from django.contrib.auth.decorators import permission_required,user_passes_test
 # from address.models import Address
 from .models import Events, Response
-from .forms import EventForm
+from .forms import EventForm, ProfileUpdateForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # from django.contrib.auth.models import Permission
 
 
@@ -100,3 +102,22 @@ def event_delete(request, pk):
         event.delete()
         return HttpResponseRedirect(reverse('meetup_finder:index'))  # Redirect to the homepage.
     return HttpResponseForbidden()
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        p_form = ProfileUpdateForm(request.POST,
+                                   request.FILES,
+                                   instance=request.user.profile)
+        if p_form.is_valid():
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('/meetup_finder/profile/')
+    else:
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'p_form': p_form
+    }
+
+    return render(request, 'meetup_finder/profile.html', context)

@@ -53,6 +53,7 @@
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
+            <li><a href="/meetup_finder/profile/"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
             <li><a href="/accounts/logout"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
             {% else %}
             <li><a href="{% provider_login_url 'google' %}"><span class="glyphicon glyphicon-user"></span> Login with Google</a></li>

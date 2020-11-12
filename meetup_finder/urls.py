@@ -18,5 +18,6 @@ urlpatterns = [
     # ex: /meetup_finder/comments/list/
     # path('comments/list/', views.CommentListView.as_view(), name='commentList'),
     # path('account/logout/', views.logout_view, name='logout'),
+    path('profile/', views.profile, name='profile'),
     path('<int:pk>/delete/', views.event_delete, name='event_delete')
 ]
