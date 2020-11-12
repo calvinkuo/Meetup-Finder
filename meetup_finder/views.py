@@ -45,6 +45,9 @@ class EventListView(generic.ListView):
 
 @require_http_methods(["POST"])
 def vote(request, event_id):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
     event = get_object_or_404(Events, pk=event_id)
     try:
         selected_response = event.response_set.get(pk=request.POST['response'])
@@ -52,8 +55,6 @@ def vote(request, event_id):
         # Redisplay the event voting form.
         return get_event_details(request, event_id, "You didn't select a choice.")
     else:
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden()
         selected_response.votes += 1
         selected_response.save()
         # Always return an HttpResponseRedirect after successfully dealing
