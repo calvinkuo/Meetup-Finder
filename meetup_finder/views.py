@@ -106,17 +106,17 @@ def event_delete(request, pk):
 
 @login_required
 def profile(request):
+    context = {}
+
     if request.method == 'POST':
-        p_form = ProfileUpdateForm(request.POST, request.FILES)
-        if p_form.is_valid():
+        context['p_form'] = ProfileUpdateForm(request.POST, request.FILES)
+        if context['p_form'].is_valid():
             ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
             messages.success(request, f'Your account has been updated!')
             return HttpResponseRedirect(reverse('meetup_finder:profile'))
+        else:
+            context['show'] = True
     else:
-        p_form = ProfileUpdateForm(instance=request.user.profile)
-
-    context = {
-        'p_form': p_form,
-    }
+        context['p_form'] = ProfileUpdateForm(instance=request.user.profile)
 
     return render(request, 'meetup_finder/profile.html', context)

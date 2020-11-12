@@ -23,7 +23,7 @@
 		  </div>
 		  <p><a href="#demo" class="btn btn-info" data-toggle="collapse">Update</a></p>
 		  
-		  <div id="demo" class="collapse">
+		  <div id="demo" class="collapse{% if show %} in{% endif %}">
 			<form method="POST" enctype="multipart/form-data">
 				{% csrf_token %}
 				<fieldset class="form-group">
