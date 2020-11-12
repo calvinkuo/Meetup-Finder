@@ -3,118 +3,110 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <!-- Section - About Start -->
-  <section id="about" class="bg-white-3 pull-up">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-6 col-md-7">
-          <h2 class="font-family-alt font-weight-700 sm-title-large title-extra-large-2 text-gray-dark-2">
-            <b>{{ event.name}}</b>
-          </h2>
-          <span class="bg-base-color margin-4 no-margin-bottom no-margin-rl separator-line-extra-thick-long"></span>
-          <div class="row">
-            <div class="col-md-12">
-            <p>Description</p>
-              <p style="margin-left: 40px" class="font-family-alt margin-5-5 no-margin-bottom no-margin-rl sm-text-large text-extra-large text-gray-dark-2">
-                <br>{{event.comment}}
-              </p>
+<h1>{{ event.name }}</h1>
+
+{% if is_past %}
+    <div class="row">
+        <div class="col-sm-12 col-xs-12">
+            <div class="well text-center">
+                This is a past event.
             </div>
-            <!-- //.col-sm-6 -->
-          </div>
-          <!-- //.row -->
         </div>
-        <!-- //.col-sm-6 -->
+    </div>
+{% endif %}
 
-        <div class="col-sm-6 col-md-4 col-md-offset-1 xs-margin-8 xs-no-margin-rl xs-no-margin-bottom">
-          <div class="testimonial">
-            <div class="bg-white border border-gray-light border-round padding-5 width-100">
-              <h4 class="font-weight-700 font-family-alt">
-                Responses
-              </h4>
-              <br>
-              <div id="content", name="content", class="main">
-                <div class="row justify-content-center">
-                    <div class="col-8">
-                        <hr class ="mt-0 mb-4">
-                            <ul>
-                            {% for response in event.response_set.all %}
-                                <li>{{ response.response_text }} -- {{ response.votes }} vote{{ response.votes|pluralize }}</li>
-                            {% endfor %}
-                            </ul>
-                    </div>
-                  </div>
-              </div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-12 col-xs-12 well text-center">
+            <div class="col-sm-4 col-xs-12">
+                <div class="col-sm-12 col-xs-6">
+                    <b>Hosted By</b>
+                    <p id="organizer">{{ event.organizer }}</p>
+                </div>
+
+                <div class="col-sm-12 col-xs-6">
+                    <b>Date &amp; Time</b>
+                    <p><span id="event_date">{{ event.event_date }}</span> at <span id="event_time">{{ event.event_time }}</span></p>
+                </div>
+
+                <div class="col-sm-12 col-xs-12">
+                    <b>Location</b>
+                    <p id="address" data-geolocation="{{ event.geolocation }}">{{ event.address }}</p>
+                </div>
             </div>
-            <!-- //.bg-white -->
-          </div>
-          <!-- //.testimonial -->
+
+            <div class="col-sm-8 col-xs-12 map_container">
+                <iframe class="map"
+                    width="600"
+                    height="300"
+                    frameborder="0"
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
+                    &center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
+                </iframe>
+            </div>
+
         </div>
-        <!-- //.col-sm-6 -->
-      </div>
     </div>
-    <!-- //.container -->
-  </section>
-  <!-- //Section - About End -->
-
-  <section id="event-banner" class="bg-white pull-up">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-4 text-center">
-          <i class="fa fa-clock-o display-block text-base-color title-extra-large-2"></i>
-          <span class="display-block font-family-alt font-weight-700 letter-spacing-1 margin-5 no-margin-bottom no-margin-rl text-large text-uppercase">
-            <b>Date &amp; Time</b>
-          </span>
-          <p class="margin-3 font-family-alt no-margin-bottom no-margin-rl title-small text-gray-dark-2">
-            {{event.event_date}}<br>
-            {{event.event_time}}
-          </p>
-        </div>
-        <!-- //.col-sm-4 -->
-
-        <div class="col-sm-4 xs-margin-8 xs-no-margin-bottom xs-no-margin-rl text-center">
-          <i class="fa fa-map-marker display-block text-base-color title-extra-large-2"></i>
-          <span class="display-block font-family-alt font-weight-700 letter-spacing-1 margin-5 no-margin-bottom no-margin-rl text-large text-uppercase">
-            <b>Address</b>
-          </span>
-          <p class="margin-3 font-family-alt no-margin-bottom no-margin-rl title-small text-gray-dark-2">
-            {{event.address}}
-          </p>
-        </div>
-        <!-- //.col-sm-4 -->
-    </section>
-
-    <div class="map_container">
-        <iframe class="map"
-            width="600"
-            height="300"
-            frameborder="0"
-            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
-            &center={{event.geolocation}}&q={{ event.address }}" allowfullscreen>
-        </iframe>
-    </div>
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-{% if user.is_authenticated %}
-<form action="{% url 'meetup_finder:vote' event.pk %}" method="post">
-{% csrf_token %}
-{% for response in event.response_set.all %}
-<div class="radio-toolbar">
-    <input type="radio" name="response" id="response{{ forloop.counter }}" value="{{ response.id }}">
-    <label for="response{{ forloop.counter }}">{{ response.response_text }}</label><br>
 </div>
-{% endfor %}
-<input type="submit" value="Respond">
-</form>
 
-<br><br><br><br>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="comment" class="col-sm-12 col-xs-12 well text-center">
+            {{ event.comment }}
+        </div>
+    </div>
+</div>
 
-<form action="{% url 'meetup_finder:event_delete' event.pk %}" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Delete Event">
+<div class="row">
+    <div class="col-sm-12 col-xs-12">
+        <div class="col-sm-12 col-xs-12 well text-center">
+            <div class="col-sm-6 col-xs-6">
+                <div class="text-left" style="display: inline-block; margin-left: -1em">
+                    <ul style="margin-bottom: -5px;">
+                        {% for response in event.response_set.all %}
+                        <li style="margin-bottom: 5px;"><b>{{ response.response_text }}</b> -- {{ response.votes }} vote{{ response.votes|pluralize }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
 
-{% else %}
-<br><br>
-    <p>Login to respond to event, or delete event if you are the event creator</p>
-{%endif%}
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+            {% if user.is_authenticated %}
+                <div class="col-sm-6 col-xs-6">
+                    <form action="{% url 'meetup_finder:vote' event.pk %}" method="post">
+                        {% csrf_token %}
+                            <div class="text-left" style="display: inline-block; margin-left: -1em">
+                        {% for response in event.response_set.all %}
+                            <div class="radio-toolbar">
+                                <input type="radio" name="response" id="response{{ forloop.counter }}" value="{{ response.id }}">
+                                <label for="response{{ forloop.counter }}">{{ response.response_text }}</label><br>
+                            </div>
+                        {% endfor %}
+                            </div><br>
+                            <input type="submit" value="Respond">
+                    </form>
+                </div>
+            {% else %}
+                <div class="col-sm-6 col-xs-6">
+                    Log in to respond to the event, or delete the event if you are the event creator.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if can_delete %}
+    <div class="row">
+        <div class="col-sm-12 col-xs-12">
+            <div class="well text-center">
+                <form action="{% url 'meetup_finder:event_delete' event.pk %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" value="Delete Event">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}
 

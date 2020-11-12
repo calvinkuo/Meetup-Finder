@@ -8,9 +8,9 @@ from django.contrib.auth.models import User
 from .models import Events, Response
 
 
-def create_event(organizer="", name="", comment="", address="", days=0):
+def db_add_event(organizer="", name="", comment="", address="", days=1):
     """
-    Creates an event with the provided parameters that
+    Adds an event with the provided parameters to the DB that
     takes place `days` from now (negative for past event).
     """
     time = timezone.now() + datetime.timedelta(days=days)
@@ -21,6 +21,29 @@ def create_event(organizer="", name="", comment="", address="", days=0):
                                  geolocation="0,0",
                                  event_date=time.date().isoformat(),
                                  event_time=time.time().isoformat())
+
+
+def create_user_and_login(self, username, password):
+    self.user = User.objects.create_user(username=username, password=password)
+    self.client.login(username=username, password=password)
+    return self.user
+
+
+def login_and_add_event(self, organizer="Test Organizer", name="Test Event Name", comment="Test Event Details",
+                        address="Test Address", geolocation="0,0", event_date="12/1/2100", event_time="1:00"):
+    self.user = create_user_and_login(self, 'testuser', '12345')
+    response = self.client.post(reverse('meetup_finder:events'), {
+        'organizer': organizer,
+        'name': name,
+        'comment': comment,
+        'address': address,
+        'geolocation': geolocation,
+        'event_date': event_date,
+        'event_time': event_time,
+    }, follow=True)  # the list of events
+
+    event = Events.objects.latest('pk') if len(response.redirect_chain) > 0 else None
+    return response, event
 
 
 class EventsIndexViewTests(TestCase):
@@ -37,7 +60,7 @@ class EventsIndexViewTests(TestCase):
         """
         An added event is displayed on the events page.
         """
-        create_event(organizer="Test Organizer",
+        db_add_event(organizer="Test Organizer",
                      name="Test Event Name",
                      comment="Test Event Details",  # event details
                      address="Test Address")
@@ -48,15 +71,31 @@ class EventsIndexViewTests(TestCase):
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
 
+    def test_past_event(self):
+        """
+        Past events are not displayed on the events page.
+        """
+        db_add_event(organizer="Past Test Organizer",
+                     name="Past Test Event Name",
+                     comment="Past Test Event Details",  # event details
+                     address="Past Test Address",
+                     days=-7)
+        response = self.client.get(reverse('meetup_finder:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Past Test Organizer")
+        self.assertNotContains(response, "Past Test Event Name")
+        self.assertNotContains(response, "Past Test Event Details")
+        self.assertNotContains(response, "Past Test Address")
+
     def test_multiple_events(self):
         """
         A second added event is displayed on the events page.
         """
-        create_event(organizer="Test Organizer",
+        db_add_event(organizer="Test Organizer",
                      name="Test Event Name",
                      comment="Test Event Details",  # event details
                      address="Test Address")
-        create_event(organizer="Test Organizer 2",
+        db_add_event(organizer="Test Organizer 2",
                      name="Test Event Name 2",
                      comment="Test Event Details 2",  # event details
                      address="Test Address 2")
@@ -67,31 +106,10 @@ class EventsIndexViewTests(TestCase):
         self.assertContains(response, "Test Address 2")
 
 
-def create_user_and_login(self, username, password):
-    self.user = User.objects.create_user(username=username, password=password)
-    self.client.login(username=username, password=password)
-    return self.user
-
-
-def login_and_add_event(self):
-    self.user = create_user_and_login(self, 'testuser', '12345')
-    response = self.client.post(reverse('meetup_finder:events'), {
-        'organizer': "Test Organizer",
-        'name': "Test Event Name",
-        'comment': "Test Event Details",
-        'address': "Test Address",
-        'geolocation': "0,0",
-        'event_date': "12/1/2020",
-        'event_time': "1:00",
-        'user': self.user
-    }, follow=True)  # the list of events
-    return response, Events.objects.latest('pk')
-
-
 class EventsCreateViewTests(TestCase):
     def test_event_form(self):
         """
-        Check that create event form works.
+        Check that the create event form loads.
         """
         response = self.client.get(reverse('meetup_finder:events'))  # the list of events
         self.assertEqual(response.status_code, 200)
@@ -102,9 +120,9 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Event date")
         self.assertContains(response, "Event time")
 
-    def test_event_form_create(self):
+    def test_event_form_submit(self):
         """
-        Check that submitting the create event form works.
+        Check that submitting a valid create event form works.
         """
         response, _ = login_and_add_event(self)
         self.assertEqual(response.status_code, 200)  # after redirect
@@ -112,8 +130,31 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Test Event Name")
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
-        self.assertContains(response, "Dec. 1, 2020")
+        self.assertContains(response, "Dec. 1, 2100")
         # self.assertContains(response, "Event time")
+
+    def test_event_form_submit_invalid(self):
+        """
+        Check that submitting an invalid event fails. Any submitted data is sent back.
+        """
+        response, _ = login_and_add_event(self, comment="", address="", geolocation="", event_date="", event_time="")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertContains(response, "This field is required.")
+
+    def test_event_form_submit_past(self):
+        """
+        Check that submitting a past event fails. Any submitted data is sent back.
+        """
+        response, _ = login_and_add_event(self, event_date="1/1/1900")
+        self.assertEqual(response.status_code, 200)  # after redirect
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertContains(response, "Test Event Details")
+        self.assertContains(response, "Test Address")
+        self.assertContains(response, "1/1/1900")
+        self.assertContains(response, "This event is in the past.")
 
 
 class EventsDetailViewTests(TestCase):
@@ -125,16 +166,17 @@ class EventsDetailViewTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
         self.assertEqual(response.status_code, 200)
-        # self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
-        self.assertContains(response, "Going -- 0 votes")
-        self.assertContains(response, "Not Going -- 0 votes")
-        self.assertContains(response, "Maybe -- 0 votes")
+        self.assertRegex(response.content, rb"Going.*0")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
         self.assertContains(response, "Respond")
-        self.assertNotContains(response, "Login to respond to event, or delete event if you are the event creator")
         self.assertContains(response, "Delete Event")  # authorized user
+        self.assertNotContains(response,
+                               "Log in to respond to the event, or delete the event if you are the event creator.")
 
     def test_event_details_noauth(self):
         """
@@ -146,19 +188,19 @@ class EventsDetailViewTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
         self.assertEqual(response.status_code, 200)
-        # self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
-        self.assertContains(response, "Going -- 0 votes")
-        self.assertContains(response, "Not Going -- 0 votes")
-        self.assertContains(response, "Maybe -- 0 votes")
+        self.assertRegex(response.content, rb"Going.*0")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
         self.assertContains(response, "Respond")
-        self.assertNotContains(response, "Login to respond to event, or delete event if you are the event creator")
-        self.assertContains(response, "Delete Event")  # not authorized user
-        # self.assertNotContains(response, "Delete Event")  # not authorized user
+        self.assertNotContains(response, "Delete Event")  # not authorized user
+        self.assertNotContains(response,
+                               "Log in to respond to the event, or delete the event if you are the event creator.")
 
-    def test_event_details_noauth(self):
+    def test_event_details_logout(self):
         """
         Detailed view displays correctly for logged-out user
         """
@@ -167,16 +209,17 @@ class EventsDetailViewTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
         self.assertEqual(response.status_code, 200)
-        # self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
-        self.assertContains(response, "Going -- 0 votes")
-        self.assertContains(response, "Not Going -- 0 votes")
-        self.assertContains(response, "Maybe -- 0 votes")
+        self.assertRegex(response.content, rb"Going.*0")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
         self.assertNotContains(response, "Respond")  # not authorized user
-        self.assertContains(response, "Login to respond to event, or delete event if you are the event creator")
         self.assertNotContains(response, "Delete Event")  # not authorized user
+        self.assertContains(response,
+                            "Log in to respond to the event, or delete the event if you are the event creator.")
 
 
 class EventsResponseVoteTests(TestCase):
@@ -185,29 +228,114 @@ class EventsResponseVoteTests(TestCase):
         Check that Votes are added properly
         """
         _, event = login_and_add_event(self)
+        self.client.logout()
+
         self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        r = event.response_set.get(response_text='Going')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
+        self.client.logout()
 
-        for r in event.response_set.all():
-            self.client.post(reverse('meetup_finder:vote',
-                                     args=[event.id]),
-                             {'response': r.id},
-                             follow=True)
+        self.user = create_user_and_login(self, 'anothertestuser', '12345')
+        r = event.response_set.get(response_text='Not Going')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*0")
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*0")
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'yetanothertestuser', '12345')
+        r = event.response_set.get(response_text='Maybe')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*1")
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertRegex(response.content, rb"Going.*1")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*1")
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'thefinaltestuser', '12345')
+        r = event.response_set.get(response_text='Going')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertRegex(response.content, rb"Going.*2")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*1")
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertRegex(response.content, rb"Going.*2")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*1")
+        self.client.logout()
 
         response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
-        self.assertContains(response, "Going -- 1 vote")
-        self.assertContains(response, "Not Going -- 1 vote")
-        self.assertContains(response, "Maybe -- 1 vote")
+        self.assertRegex(response.content, rb"Going.*2")
+        self.assertRegex(response.content, rb"Not Going.*1")
+        self.assertRegex(response.content, rb"Maybe.*1")
 
-        for r in event.response_set.all():
-            self.client.post(reverse('meetup_finder:vote',
-                                     args=[event.id]),
-                             {'response': r.id},
-                             follow=True)
+    def test_response_vote_logout(self):
+        """
+        Check that logged-out users cannot vote.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+        r = event.response_set.get(response_text='Going')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertEqual(response.status_code, 403)
 
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
-        self.assertContains(response, "Going -- 2 votes")
-        self.assertContains(response, "Not Going -- 2 votes")
-        self.assertContains(response, "Maybe -- 2 votes")
+    def test_response_vote_invalid(self):
+        """
+        Check that not selecting a choice throws an error message and does not add a vote.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {}, follow=True)
+        self.assertRegex(response.content, rb"Going.*0")
+        self.assertRegex(response.content, rb"Not Going.*0")
+        self.assertRegex(response.content, rb"Maybe.*0")
+        self.assertContains(response, "You didn&#x27;t select a choice.")  # Django escapes the apostrophe
+
+    # def test_response_vote_double(self):
+    #     """
+    #     Check that users cannot vote multiple times
+    #     """
+    #     _, event = login_and_add_event(self)
+    #     self.client.logout()
+    #
+    #     self.user = create_user_and_login(self, 'differenttestuser', '12345')
+    #     r = event.response_set.get(response_text='Going')
+    #     self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+    #     response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+    #     self.assertRegex(response.content, rb"Going.*1")
+    #     # self.assertContains(response, "You didn&#x27;t select a choice.")  # check for error once implemented
+
+    # def test_response_vote_change(self):
+    #     """
+    #     Check that a different response changes the previous vote
+    #     """
+    #     _, event = login_and_add_event(self)
+    #     self.client.logout()
+    #
+    #     self.user = create_user_and_login(self, 'differenttestuser', '12345')
+    #     r = event.response_set.get(response_text='Going')
+    #     self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+    #     r = event.response_set.get(response_text='Not Going')
+    #     response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+    #     self.assertRegex(response.content, rb"Going.*0")
+    #     self.assertRegex(response.content, rb"Not Going.*1")
+    #     # self.assertContains(response, "You didn&#x27;t select a choice.")  # check for error once implemented
 
 
 class EventsResponseDeleteTests(TestCase):
@@ -223,19 +351,28 @@ class EventsResponseDeleteTests(TestCase):
         self.assertNotContains(response, "Test Event Name")
         self.assertNotContains(response, "Test Event Details")
         self.assertNotContains(response, "Test Address")
-        self.assertNotContains(response, "Dec. 1, 2020")
+        self.assertNotContains(response, "Dec. 1, 2100")
 
         response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
         self.assertEqual(response.status_code, 404)
-#
-#
-#     def test_delete_event_no_auth(self):
-#         """
-#         Check that non-authorized user cannot delete event
-#         """
-#         _, event = login_and_add_event(self)
-#         self.client.logout()
-#         self.user = create_user_and_login(self, 'differenttestuser', '12345')
-#
-#         response = self.client.get(reverse('meetup_finder:event_delete', args=[event.pk]))
-#         self.assertContains(response, "You don't have access to delete this event")
+
+    def test_delete_event_no_auth(self):
+        """
+        Check that non-authorized user cannot delete event
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+
+        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_delete_event_logout(self):
+        """
+        Check that logged-out user cannot delete event
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
+        self.assertEqual(response.status_code, 403)

@@ -9,31 +9,31 @@
 
 {% if event_list %}
 {% for event in event_list %}
-<div class="row" data-geolocation="{{event.geolocation}}">
-    <div class="col-sm-3">
+<div class="row" data-geolocation="{{ event.geolocation }}">
+    <div class="col-sm-3 col-xs-12">
         <div class="well">
-            <p><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></p>
+            <b><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></b>
         </div>
     </div>
-    <div class="col-sm-9">
-    <div class="well">
-        <ul>
-            <li>Organizer: {{ event.organizer }}</li>
-            <li>Details: {{ event.comment }}</li>
-            <li>Address: {{ event.address }}</li>
-            <li>Date: {{ event.event_date }}</li>
-        </ul>
-        <div class="map_container">
-            <iframe class="map"
-                width="600"
-                height="300"
-                frameborder="0"
-                src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
-                &center={{event.geolocation}}&q={{ event.address }}" allowfullscreen>
-            </iframe>
+    <div class="col-sm-9 col-xs-12">
+        <div class="well">
+            <ul>
+                <li>Organizer: {{ event.organizer }}</li>
+                <li>Details: {{ event.comment }}</li>
+                <li>Address: {{ event.address }}</li>
+                <li>Date: {{ event.event_date }}</li>
+            </ul>
+            <div class="map_container">
+                <iframe class="map"
+                    width="600"
+                    height="300"
+                    frameborder="0"
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
+                    &center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
+                </iframe>
+            </div>
         </div>
-   </div>
- </div>
+    </div>
 </div>
 {% endfor %}
 {% else %}
