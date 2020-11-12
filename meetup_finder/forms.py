@@ -1,11 +1,25 @@
 from django import forms
-from address.forms import AddressField
+# from address.forms import AddressField
 from django_google_maps import widgets as map_widgets
-from django_google_maps import fields as map_fields
+# from django_google_maps import fields as map_fields
 from .models import Events
 
 
 class EventForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        placeholder = {
+            'organizer': 'Enter the group or person hosting this event',
+            'name': 'Enter a title',
+            'comment': 'Enter a description',
+            'event_date': 'Enter a date',
+            'event_time': 'Enter a time',
+            'address': 'Enter a location',
+            'geolocation': '',
+        }
+        for name, value in self.fields.items():
+            value.widget.attrs['placeholder'] = placeholder[name]
+
     class Meta: 
         model = Events
         fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address', 'geolocation']

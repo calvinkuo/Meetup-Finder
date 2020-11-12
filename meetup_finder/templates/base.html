@@ -44,7 +44,7 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
+            <li><a href="/">Home</a></li>
             {% load socialaccount %}
             {% if user.is_authenticated %}
             <li><a href="/meetup_finder/registration/"> Create Event</a></li>
@@ -72,7 +72,6 @@
     </div>
 
 
-        </form><br><br><br><br><br><br><br><br>
         <!-- Footer -->
         <footer class="page-footer font-small blue pt-4">
         
@@ -84,29 +83,29 @@
         
               <!-- Grid column -->
               <div class="col-md-6 mt-md-0 mt-3">
-        
+
                 <!-- Content -->
                 <h5 class="text-uppercase">About Us</h5>
                 <p>Web Page to create events and respond to events</p>
-        
+
               </div>
               <!-- Grid column -->
-        
-              <hr class="clearfix w-100 d-md-none pb-3">
-        
-              <!-- Grid column -->
+
+              {% if user.is_authenticated %}
               <div class="col-md-3 mb-md-0 mb-3">
-        
+
                 <!-- Links -->
                 <h5 class="text-uppercase">Links</h5>
-                {% if user.is_authenticated %}
                 <ul class="list-unstyled">
                   <li>
-                    <a href="/meetup_finder/comments/">Create Event</a>
+                    <a href="/meetup_finder/registration/">Create Event</a>
                   </li>
                 </ul>
-                {% endif %}
               </div>
+              {% endif %}
+
+              <!-- Grid column -->
+              <hr class="clearfix w-100 d-md-none pb-3">
               <!-- Grid column -->
         
               <!-- Grid column -->
@@ -117,7 +116,7 @@
         
                 <ul class="list-unstyled">
                   <li>
-                    <a href="/meetup_finder/comments/list/">Find Event</a>
+                    <a href="/meetup_finder/">Find Event</a>
                   </li>
               </div>
               <!-- Grid column -->

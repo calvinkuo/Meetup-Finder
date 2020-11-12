@@ -89,7 +89,7 @@
             height="300"
             frameborder="0"
             src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
-            &q={{ event.address }}" allowfullscreen>
+            &center={{event.geolocation}}&q={{ event.address }}" allowfullscreen>
         </iframe>
     </div>
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}

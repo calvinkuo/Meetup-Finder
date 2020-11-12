@@ -1,4 +1,4 @@
-Django
+Django~=3.1.3
 gunicorn
 django-heroku
 asgiref
@@ -15,4 +15,4 @@ sqlparse
 whitenoise
 xlrd
 django-address
-django_google_maps
+django-google-maps

@@ -3,12 +3,14 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views import generic
 from django.utils import timezone
-from django.contrib.auth.decorators import permission_required,user_passes_test
-from address.models import Address
+# from django.contrib.auth.decorators import permission_required,user_passes_test
+# from address.models import Address
 from .models import Question, Events, Response
 from .forms import EventForm
-import datetime
+# import datetime
 from django.contrib.auth.models import Permission
+
+
 class IndexView(generic.ListView):
     template_name = 'meetup_finder/results.html'
     context_object_name = 'latest_question_list'
@@ -23,12 +25,15 @@ class DetailView(generic.DetailView):
     model = Events
     template_name = 'meetup_finder/detail.html'
     context_object_name = 'event'
+
     def get_queryset(self):
         return Events.objects.all()
+
 
 class ResultsView(generic.DetailView):
     model = Events
     template_name = 'meetup_finder/results.html'
+
 
 def vote(request, event_id):
     event= get_object_or_404(Events, pk=event_id)
@@ -48,8 +53,9 @@ def vote(request, event_id):
         # user hits the Back button.
         return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
+
 def get_events(request):
-    addresses = Address.objects.all()
+    # addresses = Address.objects.all()
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
@@ -57,9 +63,9 @@ def get_events(request):
             permission = Permission.objects.get(codename='can_delete')
             request.user.user_permissions.add(permission)
             post.save()
-            post.response_set.create(response_text = 'Going', votes = 0)
-            post.response_set.create(response_text = 'Not Going', votes = 0)
-            post.response_set.create(response_text = 'Maybe', votes = 0)
+            post.response_set.create(response_text='Going', votes=0)
+            post.response_set.create(response_text='Not Going', votes=0)
+            post.response_set.create(response_text='Maybe', votes=0)
             return HttpResponseRedirect(reverse('meetup_finder:index'))
             # s = Comments(organizer = form.cleaned_data['organizer'], name_text=form.cleaned_data['name_text'], comment_text=form.cleaned_data['comment_text'], address = Address.objects.last())
             # s.save()
@@ -67,14 +73,16 @@ def get_events(request):
     else:
         form = EventForm()
 
-    return render(request, 'meetup_finder/registration.html', {'form': form, 'addresses' : addresses})
+    return render(request, 'meetup_finder/registration.html', {'form': form})
+
 
 class EventListView(generic.ListView):
     template_name = 'meetup_finder/index.html'
     context_object_name = 'event_list'
 
     def get_queryset(self):
-        return Events.objects.filter(event_date__gte = timezone.now())
+        return Events.objects.filter(event_date__gte=timezone.now())
+
 
 # @user_passes_test(lambda u: u.is_allowed_to_see_view_event_delete())
 def event_delete(request, pk):
@@ -89,6 +97,6 @@ def event_delete(request, pk):
     return render(request, 'meetup_finder/index.html', {'event': event})
 
 
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect('meetup_finder/account/logout/')
+# def logout_view(request):
+#     logout(request)
+#     return HttpResponseRedirect('meetup_finder/account/logout/')
