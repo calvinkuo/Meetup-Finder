@@ -8,17 +8,19 @@ from django.contrib.auth.models import User
 from .models import Events, Response
 
 
-def db_add_event(organizer="", name="", comment="", address="", days=1):
+def db_add_event(organizer="Test Organizer", name="Test Event Name", comment="Test Event Details",
+                        address="Test Address", geolocation="0,0", days=1):
     """
     Adds an event with the provided parameters to the DB that
     takes place `days` from now (negative for past event).
+    (This event does not have going/not going/maybe data initialized.)
     """
     time = timezone.now() + datetime.timedelta(days=days)
     return Events.objects.create(organizer=organizer,
                                  name=name,
                                  comment=comment,  # event details
                                  address=address,
-                                 geolocation="0,0",
+                                 geolocation=geolocation,
                                  event_date=time.date().isoformat(),
                                  event_time=time.time().isoformat())
 
@@ -60,10 +62,7 @@ class EventsIndexViewTests(TestCase):
         """
         An added event is displayed on the events page.
         """
-        db_add_event(organizer="Test Organizer",
-                     name="Test Event Name",
-                     comment="Test Event Details",  # event details
-                     address="Test Address")
+        db_add_event()
         response = self.client.get(reverse('meetup_finder:index'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
@@ -75,11 +74,7 @@ class EventsIndexViewTests(TestCase):
         """
         Past events are not displayed on the events page.
         """
-        db_add_event(organizer="Past Test Organizer",
-                     name="Past Test Event Name",
-                     comment="Past Test Event Details",  # event details
-                     address="Past Test Address",
-                     days=-7)
+        db_add_event(days=-7)
         response = self.client.get(reverse('meetup_finder:index'))
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Past Test Organizer")
@@ -221,6 +216,28 @@ class EventsDetailViewTests(TestCase):
         self.assertContains(response,
                             "Log in to respond to the event, or delete the event if you are the event creator.")
 
+    def test_event_details_past(self):
+        """
+        Detailed view displays notice for past event
+        """
+        event = db_add_event(days=-7)
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertContains(response, "Test Event Details")
+        self.assertContains(response, "Test Address")
+        self.assertContains(response, "This is a past event.")
+
+    def test_event_details_no_event(self):
+        """
+        Check that an invalid/deleted event id is handled
+        """
+        _, event = login_and_add_event(self)
+        self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]), follow=True)
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertEqual(response.status_code, 404)
+
 
 class EventsResponseVoteTests(TestCase):
     def test_response_vote(self):
@@ -337,6 +354,18 @@ class EventsResponseVoteTests(TestCase):
     #     self.assertRegex(response.content, rb"Not Going.*1")
     #     # self.assertContains(response, "You didn&#x27;t select a choice.")  # check for error once implemented
 
+    def test_response_vote_no_event(self):
+        """
+        Check that an invalid/deleted event id is handled
+        """
+        _, event = login_and_add_event(self)
+        r = event.response_set.get(response_text='Going')
+        self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]), follow=True)
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
+        self.assertEqual(response.status_code, 404)
+
 
 class EventsResponseDeleteTests(TestCase):
     def test_delete_event_auth(self):
@@ -352,9 +381,6 @@ class EventsResponseDeleteTests(TestCase):
         self.assertNotContains(response, "Test Event Details")
         self.assertNotContains(response, "Test Address")
         self.assertNotContains(response, "Dec. 1, 2100")
-
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
-        self.assertEqual(response.status_code, 404)
 
     def test_delete_event_no_auth(self):
         """
@@ -376,3 +402,34 @@ class EventsResponseDeleteTests(TestCase):
 
         response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
         self.assertEqual(response.status_code, 403)
+
+
+class ThirdPartyTests(TestCase):
+    """
+    Tests to ensure none of the third-party libraries break due to any changes in settings.py, the DB, etc.
+    """
+    def test_root(self):
+        """
+        Check that the root page loads
+        """
+        response = self.client.get('/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_allauth_logout(self):
+        """
+        Check that allauth's logout page loads
+        """
+        _, event = login_and_add_event(self)
+
+        response = self.client.get('/accounts/logout/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.post('/accounts/logout/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_admin_login(self):
+        """
+        Check that the admin login page loads
+        """
+        response = self.client.get('/admin/', follow=True)
+        self.assertEqual(response.status_code, 200)
