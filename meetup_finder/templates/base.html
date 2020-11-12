@@ -47,16 +47,16 @@
             <li><a href="/">Home</a></li>
             {% load socialaccount %}
             {% if user.is_authenticated %}
-            <li><a href="/meetup_finder/registration/"> Create Event</a></li>
-            <p style="color:white">Welcome, {{ user.username }} </p>
+            <li><a href="/meetup_finder/registration/">Create Event</a></li>
+            <p style="color:white">Welcome, {{ user.profile.full_name|default:user.username}} </p>
             {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
             <li><a href="/meetup_finder/profile/"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
-            <li><a href="/accounts/logout"><span class="glyphicon glyphicon-user"></span> Logout</a></li>
+            <li><a href="/accounts/logout/"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
             {% else %}
-            <li><a href="{% provider_login_url 'google' %}"><span class="glyphicon glyphicon-user"></span> Login with Google</a></li>
+            <li><a href="/accounts/login/"><span class="glyphicon glyphicon-log-in"></span> Sign In</a></li>
             {% endif %}
           </ul>
         </div>
@@ -83,34 +83,16 @@
             <div class="row">
         
               <!-- Grid column -->
-              <div class="col-md-6 mt-md-0 mt-3">
+              <div class="col-sm-6 col-xs-12">
 
                 <!-- Content -->
                 <h5 class="text-uppercase">About Us</h5>
                 <p>Web Page to create events and respond to events</p>
 
               </div>
-              <!-- Grid column -->
-
-              {% if user.is_authenticated %}
-              <div class="col-md-3 mb-md-0 mb-3">
-
-                <!-- Links -->
-                <h5 class="text-uppercase">Links</h5>
-                <ul class="list-unstyled">
-                  <li>
-                    <a href="/meetup_finder/registration/">Create Event</a>
-                  </li>
-                </ul>
-              </div>
-              {% endif %}
-
-              <!-- Grid column -->
-              <hr class="clearfix w-100 d-md-none pb-3">
-              <!-- Grid column -->
         
               <!-- Grid column -->
-              <div class="col-md-3 mb-md-0 mb-3">
+              <div class="col-sm-6 col-xs-12">
         
                 <!-- Links -->
                 <h5 class="text-uppercase">Links</h5>
@@ -119,6 +101,11 @@
                   <li>
                     <a href="/meetup_finder/">Find Event</a>
                   </li>
+				  {% if user.is_authenticated %}
+                  <li>
+                    <a href="/meetup_finder/registration/">Create Event</a>
+                  </li>
+				  {% endif %}
               </div>
               <!-- Grid column -->
         

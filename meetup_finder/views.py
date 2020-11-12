@@ -45,24 +45,23 @@ class EventListView(generic.ListView):
 #     template_name = 'meetup_finder/results.html'
 
 
-@require_http_methods(["POST"])
+@login_required
 def vote(request, event_id):
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     event = get_object_or_404(Events, pk=event_id)
-    try:
-        selected_response = event.response_set.get(pk=request.POST['response'])
-    except (KeyError, Response.DoesNotExist):
-        # Redisplay the event voting form.
-        return get_event_details(request, event_id, "You didn't select a choice.")
-    else:
-        selected_response.votes += 1
-        selected_response.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
+    if request.method == 'POST':
+        try:
+            selected_response = event.response_set.get(pk=request.POST['response'])
+        except (KeyError, Response.DoesNotExist):
+            # Redisplay the event voting form.
+            return get_event_details(request, event_id, "You didn't select a choice.")
+        else:
+            selected_response.votes += 1
+            selected_response.save()
+
+    # Always return an HttpResponseRedirect after successfully dealing
+    # with POST data. This prevents data from being posted twice if a
+    # user hits the Back button.
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
 
 def get_events(request):
@@ -95,6 +94,7 @@ def get_event_details(request, pk, error_message=''):
     })
 
 
+@login_required
 @require_http_methods(["POST"])
 def event_delete(request, pk):
     event = get_object_or_404(Events, pk=pk)
@@ -103,21 +103,20 @@ def event_delete(request, pk):
         return HttpResponseRedirect(reverse('meetup_finder:index'))  # Redirect to the homepage.
     return HttpResponseForbidden()
 
+
 @login_required
 def profile(request):
     if request.method == 'POST':
-        p_form = ProfileUpdateForm(request.POST,
-                                   request.FILES,
-                                   instance=request.user.profile)
+        p_form = ProfileUpdateForm(request.POST, request.FILES)
         if p_form.is_valid():
-            p_form.save()
+            ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
             messages.success(request, f'Your account has been updated!')
-            return redirect('/meetup_finder/profile/')
+            return HttpResponseRedirect(reverse('meetup_finder:profile'))
     else:
         p_form = ProfileUpdateForm(instance=request.user.profile)
 
     context = {
-        'p_form': p_form
+        'p_form': p_form,
     }
 
     return render(request, 'meetup_finder/profile.html', context)

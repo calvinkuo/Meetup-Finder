@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from .models import Events, Response
+from .models import Events
 
 
 def db_add_event(organizer="Test Organizer", name="Test Event Name", comment="Test Event Details",
@@ -307,8 +307,8 @@ class EventsResponseVoteTests(TestCase):
         _, event = login_and_add_event(self)
         self.client.logout()
         r = event.response_set.get(response_text='Going')
-        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
-        self.assertEqual(response.status_code, 403)
+        response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id})
+        self.assertEqual(response.status_code, 302)  # redirect to login
 
     def test_response_vote_invalid(self):
         """
@@ -401,7 +401,76 @@ class EventsResponseDeleteTests(TestCase):
         self.client.logout()
 
         response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+
+class ProfileTests(TestCase):
+    def test_profile(self):
+        """
+        Check that profile loads
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        response = self.client.get(reverse('meetup_finder:profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Name')
+        self.assertContains(response, 'Email')
+        self.assertContains(response, 'Update')
+
+    def test_profile_submit(self):
+        """
+        Check that submitting a valid profile update form works.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        response = self.client.post(reverse('meetup_finder:profile'),
+                                    {
+                                        'full_name': "Test User",
+                                        'bio': "I am a user from Testlandia.",
+                                        'birthday': "01/01/1970"
+                                    },
+                                    follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test User')
+        self.assertContains(response, 'I am a user from Testlandia.')
+        self.assertContains(response, 'Jan. 1, 1970')
+
+    def test_profile_invalid(self):
+        """
+        Check that submitting an invalid profile update form fails. Any submitted data is sent back.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        self.client.post(reverse('meetup_finder:profile'),
+                         {
+                             'full_name': "Test User",
+                             'bio': "I am a user from Testlandia.",
+                             'birthday': "01/01/1970",
+                         })
+
+        response = self.client.post(reverse('meetup_finder:profile'),
+                                    {
+                                        'full_name': "",
+                                        'bio': "I am a user from Testlandshire.",
+                                        'birthday': "Not a Date",
+                                    },
+                                    follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test User')
+        self.assertContains(response, 'I am a user from Testlandia.')
+        self.assertContains(response, 'Jan. 1, 1970')
+
+        self.assertContains(response, "This field is required.")
+        self.assertContains(response, 'I am a user from Testlandshire.')
+        self.assertContains(response, 'Not a Date')
+        self.assertContains(response, 'Enter a valid date.')
+
+    def test_profile_logout(self):
+        """
+        Check that logged-out user viewing profile is redirected
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        self.client.logout()
+
+        response = self.client.get(reverse('meetup_finder:profile'))
+        self.assertEqual(response.status_code, 302)  # redirect to login
 
 
 class ThirdPartyTests(TestCase):
@@ -415,9 +484,9 @@ class ThirdPartyTests(TestCase):
         response = self.client.get('/', follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_allauth_logout(self):
+    def test_allauth(self):
         """
-        Check that allauth's logout page loads
+        Check that allauth pages load
         """
         _, event = login_and_add_event(self)
 
@@ -425,6 +494,12 @@ class ThirdPartyTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post('/accounts/logout/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/accounts/login/', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get('/accounts/signup/', follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_admin_login(self):

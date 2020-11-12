@@ -70,11 +70,12 @@ class Response(models.Model):
     def __str__(self):
         return self.response_text
 
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    full_name = models.CharField("First and Last Name", max_length=200,)
-    bio = models.CharField("BIO", max_length = 500)
-    birthday = models.DateField("Birthday",null=True)
+    full_name = models.CharField("First and Last Name", max_length=200)
+    bio = models.CharField("Bio", max_length=500, blank=True)
+    birthday = models.DateField("Birthday", null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'

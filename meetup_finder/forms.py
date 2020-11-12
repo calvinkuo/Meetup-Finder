@@ -34,6 +34,7 @@ class EventForm(forms.ModelForm):
         # event_date = forms.DateField(label= 'Date of Event', widget = forms.SelectDateWidget)
         # event_time = forms.TimeField(label= 'Event Time')
 
+
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
