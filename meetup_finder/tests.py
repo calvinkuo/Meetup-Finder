@@ -490,21 +490,21 @@ class ThirdPartyTests(TestCase):
         """
         _, event = login_and_add_event(self)
 
-        response = self.client.get('/accounts/logout/', follow=True)
+        response = self.client.get(reverse('account_logout'), follow=True)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.post('/accounts/logout/', follow=True)
+        response = self.client.post(reverse('account_logout'), follow=True)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get('/accounts/login/', follow=True)
+        response = self.client.get(reverse('account_login'), follow=True)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get('/accounts/signup/', follow=True)
+        response = self.client.get(reverse('account_signup'), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_admin_login(self):
         """
         Check that the admin login page loads
         """
-        response = self.client.get('/admin/', follow=True)
+        response = self.client.get(reverse('admin:index'), follow=True)
         self.assertEqual(response.status_code, 200)
