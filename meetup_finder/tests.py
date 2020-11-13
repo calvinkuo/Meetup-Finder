@@ -32,8 +32,10 @@ def create_user_and_login(self, username, password):
 
 
 def login_and_add_event(self, organizer="Test Organizer", name="Test Event Name", comment="Test Event Details",
-                        address="Test Address", geolocation="0,0", event_date="12/1/2100", event_time="1:00"):
-    self.user = create_user_and_login(self, 'testuser', '12345')
+                        address="Test Address", geolocation="0,0", event_date="12/1/2100", event_time="1:00",
+                        login=True, follow=True):
+    if login:
+        self.user = create_user_and_login(self, 'testuser', '12345')
     response = self.client.post(reverse('meetup_finder:events'), {
         'organizer': organizer,
         'name': name,
@@ -42,9 +44,12 @@ def login_and_add_event(self, organizer="Test Organizer", name="Test Event Name"
         'geolocation': geolocation,
         'event_date': event_date,
         'event_time': event_time,
-    }, follow=True)  # the list of events
+    }, follow=follow)  # the list of events
 
-    event = Events.objects.latest('pk') if len(response.redirect_chain) > 0 else None
+    try:
+        event = Events.objects.latest('pk')
+    except Events.DoesNotExist:
+        event = None
     return response, event
 
 
@@ -106,7 +111,8 @@ class EventsCreateViewTests(TestCase):
         """
         Check that the create event form loads.
         """
-        response = self.client.get(reverse('meetup_finder:events'))  # the list of events
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        response = self.client.get(reverse('meetup_finder:events'))  # event creation
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Organizer")
         self.assertContains(response, "Event Name")
@@ -150,6 +156,33 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Test Address")
         self.assertContains(response, "1/1/1900")
         self.assertContains(response, "This event is in the past.")
+
+    def test_response_vote_logout_get(self):
+        """
+        Check that logged-out users cannot access the submit event form.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        self.client.logout()
+
+        response = self.client.get(reverse('meetup_finder:events'))  # event creation
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+    def test_response_vote_logout_post(self):
+        """
+        Check that logged-out users cannot submit an event.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        self.client.logout()
+
+        response, _ = login_and_add_event(self, login=False, follow=False)
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+        response = self.client.get(reverse('meetup_finder:index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Test Organizer")
+        self.assertNotContains(response, "Test Event Name")
+        self.assertNotContains(response, "Test Event Details")
+        self.assertNotContains(response, "Test Address")
 
 
 class EventsDetailViewTests(TestCase):

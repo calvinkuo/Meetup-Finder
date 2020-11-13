@@ -64,6 +64,7 @@ def vote(request, event_id):
     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
 
+@login_required
 def get_events(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
