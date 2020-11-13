@@ -58,11 +58,11 @@ var coordinates = {{% for event in event_list %}
 function filterEvents() {
 	$(".event").css("display", "block");
 	
-	var query = document.getElementById("filter").value.split(",");
+	var query = document.getElementById("filter").value.toLowerCase().split(",");
 	if (query.length > 1 || query[0] !== "") {
 		var match = function(index, element) {
 			for (var i = 0; i < query.length; i++) {
-				if ($(element).text().indexOf(query[i]) > -1 && query[i].length > 0) {
+				if ($(element).text().toLowerCase().indexOf(query[i]) > -1 && query[i].length > 0) {
 					return false; // matches query
 				}
 			}
