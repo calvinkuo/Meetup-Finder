@@ -8,7 +8,7 @@
 <h1>Events</h1>
 <div class="row" style="margin-bottom: 1rem">
 	<div class="col-sm-9">
-		<input type="text" class="form-control" id="Filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()">
+		<input type="text" class="form-control" id="filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()">
 	</div>
 	<div class="col-sm-3 text-right">
 		<button type="button" id="sort-button" class="btn btn-outline-info" onclick="sortByDistance()">Sort by distance</button>
@@ -56,7 +56,20 @@ var coordinates = {{% for event in event_list %}
 }
 
 function filterEvents() {
-
+	$(".event").css("display", "block");
+	
+	var query = document.getElementById("filter").value.split(",");
+	if (query.length > 1 || query[0] !== "") {
+		var match = function(index, element) {
+			for (var i = 0; i < query.length; i++) {
+				if ($(element).text().indexOf(query[i]) > -1 && query[i].length > 0) {
+					return false; // matches query
+				}
+			}
+			return true; // does not match query
+		}
+		$(".event").filter(match).css("display", "none"); // hides elements that do not match query
+	}
 }
 
 function sortByDistance() {
