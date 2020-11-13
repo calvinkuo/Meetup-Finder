@@ -78,7 +78,7 @@ def get_events(request):
                 post.response_set.create(response_text='Going', votes=0)
                 post.response_set.create(response_text='Not Going', votes=0)
                 post.response_set.create(response_text='Maybe', votes=0)
-                return HttpResponseRedirect(reverse('meetup_finder:index'))
+                return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
     else:
         form = EventForm()
 

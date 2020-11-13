@@ -132,7 +132,14 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "Test Event Details")
         self.assertContains(response, "Test Address")
         self.assertContains(response, "Dec. 1, 2100")
-        # self.assertContains(response, "Event time")
+        self.assertContains(response, "1 a.m.")
+
+        response = self.client.get(reverse('meetup_finder:index'))  # check index page for event
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertContains(response, "Test Event Details")
+        self.assertContains(response, "Test Address")
+        self.assertContains(response, "Dec. 1, 2100")
 
     def test_event_form_submit_invalid(self):
         """
