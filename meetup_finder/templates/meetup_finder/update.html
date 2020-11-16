@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% if can_delete %}
+    <div id="demo" class="collapse{% if show %} in{% endif %}">
+        <form action="{% url 'meetup_finder:event_update' event.pk%}"method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Event Update</legend>
+                {{ e_form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}
+
