@@ -30,16 +30,23 @@ class EventForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    placeholder = {
-        'comment_field': 'Leave a comment...'
-    }
-
     class Meta:
         model = EventComment
         fields = ['comment_field']
 
 
 class ProfileUpdateForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        placeholder = {
+            'full_name': 'Your name',
+            'bio': 'A short description of yourself',
+            'birthday': 'Your birthday',
+            'default_filter': 'The filter to use by default on the home page',
+        }
+        for name, value in self.fields.items():
+            value.widget.attrs['placeholder'] = placeholder[name]
+
     class Meta:
         model = Profile
-        fields = ['full_name', 'bio', 'birthday']
+        fields = ['full_name', 'bio', 'birthday', 'default_filter']

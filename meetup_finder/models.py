@@ -62,6 +62,7 @@ class Profile(models.Model):
     full_name = models.CharField("First and Last Name", max_length=200)
     bio = models.CharField("Bio", max_length=500, blank=True)
     birthday = models.DateField("Birthday", null=True, blank=True)
+    default_filter = models.CharField("Default Search Filter", max_length=500, blank=True)
 
     def __str__(self):
         return f'{self.user.username} Profile'
