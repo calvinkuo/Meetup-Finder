@@ -6,36 +6,133 @@
 {% block content %}
 
 <h1>Events</h1>
-
-{% if event_list %}
-{% for event in event_list %}
-<div class="row" data-geolocation="{{ event.geolocation }}">
-    <div class="col-sm-3 col-xs-12">
-        <div class="well">
-            <b><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></b>
-        </div>
-    </div>
-    <div class="col-sm-9 col-xs-12">
-        <div class="well">
-            <ul>
-                <li>Organizer: {{ event.organizer }}</li>
-                <li>Details: {{ event.comment }}</li>
-                <li>Address: {{ event.address }}</li>
-                <li>Date: {{ event.event_date }}</li>
-            </ul>
-            <div class="map_container">
-                <iframe class="map"
-                    width="600"
-                    height="300"
-                    frameborder="0"
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
-                    &center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
-                </iframe>
-            </div>
-        </div>
-    </div>
+<div class="row" style="margin-bottom: 1rem">
+	<div class="col-sm-9">
+		<input type="text" class="form-control" id="filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()">
+	</div>
+	<div class="col-sm-3 text-right">
+		<button type="button" id="sort-button" class="btn btn-outline-info" onclick="sortByDistance()">Sort by distance</button>
+	</div>
 </div>
+{% if event_list %}
+<div id="event-list">
+{% for event in event_list %}
+	<div data-pk="{{ event.pk }}" class="row event">
+		<div class="col-sm-3 col-xs-12">
+			<div class="well">
+				<div>
+					<b><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></b>
+				</div>
+				<div>
+					<span id="distance-{{ event.pk }}" class="distance"></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-9 col-xs-12">
+			<div class="well">
+				<ul>
+					<li>Organizer: {{ event.organizer }}</li>
+					<li>Details: {{ event.comment }}</li>
+					<li>Address: {{ event.address }}</li>
+					<li>Date: {{ event.event_date }}</li>
+				</ul>
+				<div class="map_container">
+					<iframe class="map"
+						width="600"
+						height="300"
+						frameborder="0"
+						src="https://www.google.com/maps/embed/v1/place?key=AIzaSyDy_u0JlGjAPtuCX_BLf_AbkMG51Q833Ls
+						&center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
+					</iframe>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endfor %}
+</div>
+<script>
+var coordinates = {{% for event in event_list %}
+	{{ event.pk }}: "{{ event.geolocation }}",{% endfor %}
+}
+
+function filterEvents() {
+	$(".event").css("display", "block");
+	
+	var query = document.getElementById("filter").value.toLowerCase().split(",");
+	if (query.length > 1 || query[0] !== "") {
+		var match = function(index, element) {
+			for (var i = 0; i < query.length; i++) {
+				if ($(element).text().toLowerCase().indexOf(query[i]) > -1 && query[i].length > 0) {
+					return false; // matches query
+				}
+			}
+			return true; // does not match query
+		}
+		$(".event").filter(match).css("display", "none"); // hides elements that do not match query
+	}
+}
+
+function sortByDistance() {
+	navigator.geolocation.getCurrentPosition(sortByDistanceCallback);
+}
+
+function sortByDistanceCallback(pos) {
+	var myLat = pos.coords.latitude; // parse user coords
+	var myLong = pos.coords.longitude;
+	var distances = {};
+	for (var event in coordinates) {
+		if (coordinates.hasOwnProperty(event)) {
+			var eventLat = coordinates[event].split(',')[0]; // parse event coords
+			var eventLong = coordinates[event].split(',')[1];
+			var distance = getDistanceBetween(myLat, myLong, eventLat, eventLong);
+			distances[event] = distance;
+			document.getElementById("distance-" + event).innerHTML = distance.toFixed(1) + " mi";
+		}
+	}
+	
+	// https://stackoverflow.com/questions/282670/easiest-way-to-sort-dom-nodes
+	var list = document.getElementById("event-list");
+	
+	var items = list.childNodes;
+	var itemsArr = [];
+	for (var i in items) {
+		if (items[i].nodeType == 1) { // get rid of the whitespace text nodes
+			itemsArr.push(items[i]);
+		}
+	}
+
+	itemsArr.sort(function(a, b) {
+		a = distances[a.getAttribute("data-pk")];
+		b = distances[b.getAttribute("data-pk")];
+		return a == b ? 0 : (a > b ? 1 : -1);
+	});
+
+	for (i = 0; i < itemsArr.length; ++i) {
+		list.appendChild(itemsArr[i]);
+	}
+	
+	document.getElementById("sort-button").innerHTML = "Sorted by distance";
+	document.getElementById("sort-button").disabled = "disabled";
+}
+
+// https://stackoverflow.com/questions/18883601/function-to-calculate-distance-between-two-coordinates
+function getDistanceBetween(lat1, lon1, lat2, lon2) {
+	var R = 3958.761; // Radius of the earth in miles
+	var dLat = deg2rad(lat2-lat1);  // deg2rad below
+	var dLon = deg2rad(lon2-lon1); 
+	var a = 
+		Math.sin(dLat/2) * Math.sin(dLat/2) +
+		Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+		Math.sin(dLon/2) * Math.sin(dLon/2); 
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+	var d = R * c; // Distance in km
+	return d;
+}
+
+function deg2rad(deg) {
+	return deg * (Math.PI/180)
+}
+</script>
 {% else %}
     <p>No events are available.</p>
 {% endif %}
