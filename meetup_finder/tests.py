@@ -44,13 +44,30 @@ def login_and_add_event(self, organizer="Test Organizer", name="Test Event Name"
         'geolocation': geolocation,
         'event_date': event_date,
         'event_time': event_time,
-    }, follow=follow)  # the list of events
+    }, follow=follow)
 
     try:
         event = Events.objects.latest('pk')
     except Events.DoesNotExist:
         event = None
     return response, event
+
+
+def update_event(self, event, organizer="New Test Organizer", name="New Test Event Name",
+                 comment="New Test Event Details", address="New Test Address", geolocation="1,1",
+                 event_date="12/1/2200", event_time="11:00", follow=True):
+    response = self.client.post(reverse('meetup_finder:update', args=[event.pk]), {
+        'organizer': organizer,
+        'name': name,
+        'comment': comment,
+        'address': address,
+        'geolocation': geolocation,
+        'event_date': event_date,
+        'event_time': event_time,
+    }, follow=follow)
+
+    return response, Events.objects.get(pk=event.pk)
+
 
 
 class EventsIndexViewTests(TestCase):
@@ -164,7 +181,7 @@ class EventsCreateViewTests(TestCase):
         self.assertContains(response, "1/1/1900")
         self.assertContains(response, "This event is in the past.")
 
-    def test_response_vote_logout_get(self):
+    def test_event_form_logout_get(self):
         """
         Check that logged-out users cannot access the submit event form.
         """
@@ -174,7 +191,7 @@ class EventsCreateViewTests(TestCase):
         response = self.client.get(reverse('meetup_finder:events'))  # event creation
         self.assertEqual(response.status_code, 302)  # redirect to login
 
-    def test_response_vote_logout_post(self):
+    def test_event_form_logout_post(self):
         """
         Check that logged-out users cannot submit an event.
         """
@@ -190,6 +207,124 @@ class EventsCreateViewTests(TestCase):
         self.assertNotContains(response, "Test Event Name")
         self.assertNotContains(response, "Test Event Details")
         self.assertNotContains(response, "Test Address")
+
+
+class EventsEditViewTests(TestCase):
+    def test_event_edit_form(self):
+        """
+        Check that the edit event form loads.
+        """
+        _, event = login_and_add_event(self)
+        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertContains(response, "Test Event Details")
+        self.assertContains(response, "Test Address")
+        self.assertContains(response, "2100-12-01")
+        self.assertContains(response, "01:00:00")
+
+    def test_event_edit_form_submit(self):
+        """
+        Check that submitting a valid edit event form works.
+        """
+        _, event = login_and_add_event(self)
+        response, event = update_event(self, event)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "New Test Organizer")
+        self.assertContains(response, "New Test Event Name")
+        self.assertContains(response, "New Test Event Details")
+        self.assertContains(response, "New Test Address")
+        self.assertContains(response, "Dec. 1, 2200")
+        self.assertContains(response, "11 a.m.")
+
+    def test_event_edit_form_submit_invalid(self):
+        """
+        Check that submitting an invalid edit event fails.
+        The event remains unchanged and any submitted data is sent back.
+        """
+        _, event = login_and_add_event(self)
+        response, event = update_event(self, event, organizer="", name="Placeholder Name")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Placeholder Name")
+        self.assertContains(response, "This field is required.")
+
+        # check event not modified
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertNotContains(response, "Placeholder Name")
+
+    def test_event_edit_form_submit_past(self):
+        """
+        Check that submitting an past edit event fails.
+        The event remains unchanged and any submitted data is sent back.
+        """
+        _, event = login_and_add_event(self)
+        response, event = update_event(self, event, event_date="1/1/1900")
+        self.assertEqual(response.status_code, 200)  # after redirect
+        self.assertContains(response, "New Test Organizer")
+        self.assertContains(response, "New Test Event Name")
+        self.assertContains(response, "New Test Event Details")
+        self.assertContains(response, "New Test Address")
+        self.assertContains(response, "1/1/1900")
+        self.assertContains(response, "This event is in the past.")
+
+    def test_event_edit_form_noauth_get(self):
+        """
+        Check that non-authorized users cannot access the edit event form.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_event_edit_form_noauth_post(self):
+        """
+        Check that non-authorized users cannot access the edit event form.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response, event = update_event(self, event)
+        self.assertEqual(response.status_code, 403)
+
+        # check event not modified
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertNotContains(response, "New Test Organizer")
+        self.assertNotContains(response, "New Test Event Name")
+
+    def test_event_edit_form_logout_get(self):
+        """
+        Check that logged-out users cannot access the edit event form.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+    def test_event_edit_form_logout_post(self):
+        """
+        Check that logged-out users cannot edit an event.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        response, event = update_event(self, event, follow=False)
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+        # check event not modified
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+        self.assertNotContains(response, "New Test Organizer")
+        self.assertNotContains(response, "New Test Event Name")
 
 
 class EventsDetailViewTests(TestCase):

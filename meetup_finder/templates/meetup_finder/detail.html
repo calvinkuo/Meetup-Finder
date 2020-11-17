@@ -33,9 +33,6 @@
                     <b>Location</b>
                     <p id="address" data-geolocation="{{ event.geolocation }}">{{ event.address }}<span id="distance"></span></p>
                 </div>
-                {% if can_delete %}
-                <a href="{% url 'meetup_finder:update' event.pk%}"> Edit </a>
-                {% endif %}
             </div>
 
             <div class="col-sm-8 col-xs-12 map_container">
@@ -136,9 +133,10 @@
     <div class="row">
         <div class="col-sm-12 col-xs-12">
             <div class="well text-center">
-                <form action="{% url 'meetup_finder:event_delete' event.pk %}" method="post">
+                <form action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
                     {% csrf_token %}
-                    <input type="submit" value="Delete Event">
+                    <a class="btn btn-default" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
+                    <input class="btn btn-default" type="submit" value="Delete Event">
                 </form>
             </div>
         </div>

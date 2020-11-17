@@ -4,33 +4,11 @@ from django.urls import reverse
 from django.views import generic
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
-# from django.contrib.auth.decorators import permission_required,user_passes_test
-# from address.models import Address
 from .models import Events, Response, EventComment
-from .forms import EventForm, ProfileUpdateForm, EventUpdateForm, CommentForm
+from .forms import EventForm, ProfileUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
-# from django.contrib.auth.models import Permission
-
-
-# class IndexView(generic.ListView):
-#     template_name = 'meetup_finder/results.html'
-#     context_object_name = 'latest_question_list'
-#
-#     def get_queryset(self):
-#         return Question.objects.filter(
-#             pub_date__lte=timezone.now()
-#         ).order_by('-pub_date')[:5]
-
-
-# class DetailView(generic.DetailView):
-#     model = Events
-#     template_name = 'meetup_finder/detail.html'
-#     context_object_name = 'event'
-#
-#     def get_queryset(self):
-#         return Events.objects.all()
 
 
 class EventListView(generic.ListView):
@@ -41,42 +19,18 @@ class EventListView(generic.ListView):
         return Events.objects.filter(event_date__gt=timezone.now())
 
 
-# class ResultsView(generic.DetailView):
-#     model = Events
-#     template_name = 'meetup_finder/results.html'
-
-def writeComment(request, event_id):
-    event = get_object_or_404(Events, pk=event_id)
-    if request.method == 'POST':
-        comment = EventComment(comment_field=request.POST["comment_field"],name=request.POST["name"], event=event)
-        comment.save()
-    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
-
-
-
+def event_details(request, pk, error_message=''):
+    event = get_object_or_404(Events, pk=pk)
+    return render(request, 'meetup_finder/detail.html', {
+        'event': event,
+        'can_delete': event.user == request.user or request.user.has_perm('meetup_finder.can_delete'),
+        'error_message': error_message,
+        'is_past': event.is_past(),
+    })
 
 
 @login_required
-def vote(request, event_id):
-    event = get_object_or_404(Events, pk=event_id)
-    if request.method == 'POST':
-        try:
-            selected_response = event.response_set.get(pk=request.POST['response'])
-        except (KeyError, Response.DoesNotExist):
-            # Redisplay the event voting form.
-            return get_event_details(request, event_id, "You didn't select a choice.")
-        else:
-            selected_response.votes += 1
-            selected_response.save()
-
-    # Always return an HttpResponseRedirect after successfully dealing
-    # with POST data. This prevents data from being posted twice if a
-    # user hits the Back button.
-    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
-
-
-@login_required
-def get_events(request):
+def event_create(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
@@ -96,14 +50,24 @@ def get_events(request):
     return render(request, 'meetup_finder/registration.html', {'form': form})
 
 
-def get_event_details(request, pk, error_message=''):
+@login_required
+def event_update(request, pk):
     event = get_object_or_404(Events, pk=pk)
-    return render(request, 'meetup_finder/detail.html', {
-        'event': event,
-        'can_delete': event.user == request.user or request.user.has_perm('meetup_finder.can_delete'),
-        'error_message': error_message,
-        'is_past': event.is_past(),
-    })
+    if event.user == request.user or request.user.has_perm('meetup_finder.can_delete'):
+        if request.method == 'POST':
+            form = EventForm(request.POST, request.FILES)
+            if form.is_valid():
+                if form.instance.is_past():
+                    form.add_error('event_date', 'This event is in the past.')
+                    form.add_error('event_time', 'This event is in the past.')
+                else:
+                    post = EventForm(request.POST, request.FILES, instance=event).save()
+                    form.instance.user = request.user
+                    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
+        else:
+            form = EventForm(instance=event)
+        return render(request, 'meetup_finder/events_form.html', {'form': form})
+    return HttpResponseForbidden()
 
 
 @login_required
@@ -114,6 +78,34 @@ def event_delete(request, pk):
         event.delete()
         return HttpResponseRedirect(reverse('meetup_finder:index'))  # Redirect to the homepage.
     return HttpResponseForbidden()
+
+
+@login_required
+def write_comment(request, event_id):
+    event = get_object_or_404(Events, pk=event_id)
+    if request.method == 'POST':
+        comment = EventComment(comment_field=request.POST["comment_field"], name=request.POST["name"], event=event)
+        comment.save()
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
+
+
+@login_required
+def vote(request, event_id):
+    event = get_object_or_404(Events, pk=event_id)
+    if request.method == 'POST':
+        try:
+            selected_response = event.response_set.get(pk=request.POST['response'])
+        except (KeyError, Response.DoesNotExist):
+            # Redisplay the event voting form.
+            return event_details(request, event_id, "You didn't select a choice.")
+        else:
+            selected_response.votes += 1
+            selected_response.save()
+
+    # Always return an HttpResponseRedirect after successfully dealing
+    # with POST data. This prevents data from being posted twice if a
+    # user hits the Back button.
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
 
 @login_required
@@ -132,8 +124,3 @@ def profile(request):
         context['p_form'] = ProfileUpdateForm(instance=request.user.profile)
 
     return render(request, 'meetup_finder/profile.html', context)
-
-class EventUpdate(UpdateView):
-    model = Events
-    fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address']
-    success_url ="/"
