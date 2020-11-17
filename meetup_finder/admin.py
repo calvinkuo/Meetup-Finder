@@ -38,5 +38,6 @@ class EventsAdmin(admin.ModelAdmin):
 # admin.site.register(Question, QuestionAdmin)
 # admin.site.register(Choice)
 admin.site.register(Events, EventsAdmin)
+admin.site.register(EventComment)
 admin.site.register(Profile)
 # admin.site.register(Response)

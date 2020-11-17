@@ -96,24 +96,30 @@
         </div>
     </div>
 </div>
+<b>Leave a Comment</b>
 <div class = "row">
     <div class = "col-sm-12 col-xs-12">
         <div class = "well text-center">
             <form action="{% url 'meetup_finder:comment' event.pk %}" method = "POST">
             {% csrf_token %}
+                <label for="name">Name:</label>
                 <input type="text" id="name" name="name">
+                <label for ="comment_field">Comment:</label>
                 <input type="text" id="comment_field" name="comment_field">
-                <input type="submit" value = "add comment">
+                <input type="submit" value = "Submit">
             </form>
         </div>
     </div>
 </div>
+<b>Comments</b>
 <div class = "row">
     <div class = "col-sm-12 col-xs-12">
         <div class = "well text-center">
-            {% if event.EventComment_set.all %}
-            {% for comment in event.EventComment_set.all %}
-                Name:
+            {% if event.eventcomment_set.all %}
+            {% for comment in event.eventcomment_set.all %}
+               <p> {{comment.comment_field}}</p>
+               <p><small>Written by <b>{{comment.name}}</b></small></p>
+               <hr>
             {% endfor %}
             {% else %}
             <p>
