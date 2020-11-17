@@ -31,7 +31,7 @@ class EventForm(forms.ModelForm):
 class EventUpdateForm(forms.ModelForm):
     class Meta:
         model = Events
-        fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address', 'geolocation']
+        fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address']
 
 
 class ProfileUpdateForm(forms.ModelForm):

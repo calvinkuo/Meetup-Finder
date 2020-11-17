@@ -15,7 +15,7 @@ urlpatterns = [
     path('<int:event_id>/vote/', views.vote, name='vote'),
     # ex: /meetup_finder/comments/
     path('registration/', views.get_events, name='events'),
-    path('event_update/', views.event_update, name='update'),
+    path('<int:pk>/event_update/', views.EventUpdate.as_view(), name='update'),
     # ex: /meetup_finder/comments/list/
     # path('comments/list/', views.CommentListView.as_view(), name='commentList'),
     # path('account/logout/', views.logout_view, name='logout'),

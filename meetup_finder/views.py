@@ -10,6 +10,7 @@ from .models import Events, Response
 from .forms import EventForm, ProfileUpdateForm, EventUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.views.generic.edit import UpdateView
 # from django.contrib.auth.models import Permission
 
 
@@ -122,20 +123,7 @@ def profile(request):
 
     return render(request, 'meetup_finder/profile.html', context)
 
-@login_required
-@require_http_methods(["POST"])
-def event_update(request):
-    context = {}
-    event = get_object_or_404(Events, pk=pk)
-    if request.method == 'POST':
-        context['e_form'] = EventUpdateForm(request.POST, request.FILES)
-        if context['e_form'].is_valid():
-            EventUpdateForm(request.POST, request.FILES, instance=event).save()
-            messages.success(request, f'Your event has been updated!')
-            return HttpResponseRedirect(reverse('meetup_finder:detail'))
-        else:
-            context['show'] = True
-    else:
-        context['e_form'] = EventUpdateForm(instance=event)
-
-    return render(request, 'meetup_finder/detail.html', context)
+class EventUpdate(UpdateView):
+    model = Events
+    fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address']
+    success_url ="/"
