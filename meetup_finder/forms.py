@@ -42,7 +42,7 @@ class ProfileUpdateForm(forms.ModelForm):
             'full_name': 'Your name',
             'bio': 'A short description of yourself',
             'birthday': 'Your birthday',
-            'default_filter': 'The filter to use by default on the home page',
+            'default_filter': 'Keywords to use as your default home page (separate terms with commas)',
         }
         for name, value in self.fields.items():
             value.widget.attrs['placeholder'] = placeholder[name]
