@@ -6,8 +6,8 @@ from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 # from django.contrib.auth.decorators import permission_required,user_passes_test
 # from address.models import Address
-from .models import Events, Response
-from .forms import EventForm, ProfileUpdateForm
+from .models import Events, Response, EventComment
+from .forms import EventForm, ProfileUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 # from django.contrib.auth.models import Permission
@@ -43,6 +43,20 @@ class EventListView(generic.ListView):
 # class ResultsView(generic.DetailView):
 #     model = Events
 #     template_name = 'meetup_finder/results.html'
+
+def writeComment(request, event_id):
+    event = get_object_or_404(Events, pk=event_id)
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        com = None
+        if comment_form.is_valid():
+            com = comment_form.save()
+        else:
+            comment_form = CommentForm()
+    return render(request,'index.html',{'event':event, 'comment_field':comment,'name':name,'comment_form':comment_form})
+
+
+
 
 
 @login_required

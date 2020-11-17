@@ -61,7 +61,12 @@ class Events(models.Model):
                                            timezone.now().tzinfo)
         return event_datetime < timezone.now()
 
-
+class EventComment(models.Model):
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
+    comment_field = models.CharField(max_length=500)
+    name = models.CharField(max_length=80)
+    def __str__(self):
+        return self.comment_field
 class Response(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE)
     response_text = models.CharField(max_length=50)

@@ -2,7 +2,7 @@ from django import forms
 # from address.forms import AddressField
 from django_google_maps import widgets as map_widgets
 # from django_google_maps import fields as map_fields
-from .models import Events, Profile
+from .models import Events, Profile, EventComment
 
 
 class EventForm(forms.ModelForm):
@@ -33,7 +33,14 @@ class EventForm(forms.ModelForm):
         # address = AddressField()
         # event_date = forms.DateField(label= 'Date of Event', widget = forms.SelectDateWidget)
         # event_time = forms.TimeField(label= 'Event Time')
-
+class CommentForm(forms.ModelForm):
+    placeholder = {
+        'name' : 'Your name here',
+        'comment_field' : 'Contents'
+    }
+    class Meta:
+        model = EventComment
+        fields =['name', 'comment_field']
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:

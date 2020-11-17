@@ -84,6 +84,7 @@
                             </div>
                         {% endfor %}
                             </div><br>
+                  
                             <input type="submit" value="Respond">
                     </form>
                 </div>
@@ -95,7 +96,19 @@
         </div>
     </div>
 </div>
-
+<div class = "row">
+    <div class = "col-sm-12 col-xs-12">
+        <div class = "well text-center">
+            <form method = "POST">
+                {{ form.media }}
+                {{ form|crispy }}
+                {{ comment_form.as_p }}
+                {% csrf_token %}
+                <input type="submit" value = "add comment">
+            </form>
+        </div>
+    </div>
+</div>
 {% if can_delete %}
     <div class="row">
         <div class="col-sm-12 col-xs-12">
