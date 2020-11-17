@@ -29,6 +29,10 @@
         margin: auto;
         max-width: 100%;
       }
+
+      .comment-name, .comment-text {
+        overflow-wrap: break-word;
+      }
     </style>
   </head>
   <body>
@@ -48,7 +52,7 @@
             {% load socialaccount %}
             {% if user.is_authenticated %}
             <li><a href="{% url 'meetup_finder:events' %}">Create Event</a></li>
-            <p style="color:white">Welcome, {{ user.profile.full_name|default:user.username}} </p>
+            <p style="color:white">Welcome, {{ user.profile.get_name }} </p>
             {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">

@@ -56,7 +56,7 @@ def login_and_add_event(self, organizer="Test Organizer", name="Test Event Name"
 def update_event(self, event, organizer="New Test Organizer", name="New Test Event Name",
                  comment="New Test Event Details", address="New Test Address", geolocation="1,1",
                  event_date="12/1/2200", event_time="11:00", follow=True):
-    response = self.client.post(reverse('meetup_finder:update', args=[event.pk]), {
+    response = self.client.post(reverse('meetup_finder:update', args=[event.id]), {
         'organizer': organizer,
         'name': name,
         'comment': comment,
@@ -66,8 +66,7 @@ def update_event(self, event, organizer="New Test Organizer", name="New Test Eve
         'event_time': event_time,
     }, follow=follow)
 
-    return response, Events.objects.get(pk=event.pk)
-
+    return response, Events.objects.get(pk=event.id)
 
 
 class EventsIndexViewTests(TestCase):
@@ -215,7 +214,7 @@ class EventsEditViewTests(TestCase):
         Check that the edit event form loads.
         """
         _, event = login_and_add_event(self)
-        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:update', args=[event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
@@ -250,7 +249,7 @@ class EventsEditViewTests(TestCase):
         self.assertContains(response, "This field is required.")
 
         # check event not modified
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertNotContains(response, "Placeholder Name")
@@ -278,7 +277,7 @@ class EventsEditViewTests(TestCase):
         self.client.logout()
 
         self.user = create_user_and_login(self, 'differenttestuser', '12345')
-        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:update', args=[event.id]))
         self.assertEqual(response.status_code, 403)
 
     def test_event_edit_form_noauth_post(self):
@@ -293,7 +292,7 @@ class EventsEditViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
         # check event not modified
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertNotContains(response, "New Test Organizer")
@@ -306,7 +305,7 @@ class EventsEditViewTests(TestCase):
         _, event = login_and_add_event(self)
         self.client.logout()
 
-        response = self.client.get(reverse('meetup_finder:update', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:update', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
 
     def test_event_edit_form_logout_post(self):
@@ -320,7 +319,7 @@ class EventsEditViewTests(TestCase):
         self.assertEqual(response.status_code, 302)  # redirect to login
 
         # check event not modified
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
         self.assertNotContains(response, "New Test Organizer")
@@ -334,7 +333,7 @@ class EventsDetailViewTests(TestCase):
         """
         _, event = login_and_add_event(self)
 
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
@@ -345,8 +344,8 @@ class EventsDetailViewTests(TestCase):
         self.assertRegex(response.content, rb"Maybe.*0")
         self.assertContains(response, "Respond")
         self.assertContains(response, "Delete Event")  # authorized user
-        self.assertNotContains(response,
-                               "Log in to respond to the event, or delete the event if you are the event creator.")
+        self.assertNotContains(response, "Log in to respond to this event.")
+        self.assertNotContains(response, "Log in to leave a comment.")
 
     def test_event_details_noauth(self):
         """
@@ -356,7 +355,7 @@ class EventsDetailViewTests(TestCase):
         self.client.logout()
         self.user = create_user_and_login(self, 'differenttestuser', '12345')
 
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
@@ -367,8 +366,8 @@ class EventsDetailViewTests(TestCase):
         self.assertRegex(response.content, rb"Maybe.*0")
         self.assertContains(response, "Respond")
         self.assertNotContains(response, "Delete Event")  # not authorized user
-        self.assertNotContains(response,
-                               "Log in to respond to the event, or delete the event if you are the event creator.")
+        self.assertNotContains(response, "Log in to respond to this event.")
+        self.assertNotContains(response, "Log in to leave a comment.")
 
     def test_event_details_logout(self):
         """
@@ -377,7 +376,7 @@ class EventsDetailViewTests(TestCase):
         _, event = login_and_add_event(self)
         self.client.logout()
 
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
@@ -388,15 +387,15 @@ class EventsDetailViewTests(TestCase):
         self.assertRegex(response.content, rb"Maybe.*0")
         self.assertNotContains(response, "Respond")  # not authorized user
         self.assertNotContains(response, "Delete Event")  # not authorized user
-        self.assertContains(response,
-                            "Log in to respond to the event, or delete the event if you are the event creator.")
+        self.assertContains(response, "Log in to respond to this event.")
+        self.assertContains(response, "Log in to leave a comment.")
 
     def test_event_details_past(self):
         """
         Detailed view displays notice for past event
         """
         event = db_add_event(days=-7)
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Organizer")
         self.assertContains(response, "Test Event Name")
@@ -409,8 +408,8 @@ class EventsDetailViewTests(TestCase):
         Check that an invalid/deleted event id is handled
         """
         _, event = login_and_add_event(self)
-        self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]), follow=True)
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        self.client.post(reverse('meetup_finder:event_delete', args=[event.id]), follow=True)
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertEqual(response.status_code, 404)
 
 
@@ -428,7 +427,7 @@ class EventsResponseVoteTests(TestCase):
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*0")
         self.assertRegex(response.content, rb"Maybe.*0")
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*0")
         self.assertRegex(response.content, rb"Maybe.*0")
@@ -440,7 +439,7 @@ class EventsResponseVoteTests(TestCase):
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*0")
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*0")
@@ -452,7 +451,7 @@ class EventsResponseVoteTests(TestCase):
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*1")
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertRegex(response.content, rb"Going.*1")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*1")
@@ -464,13 +463,13 @@ class EventsResponseVoteTests(TestCase):
         self.assertRegex(response.content, rb"Going.*2")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*1")
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertRegex(response.content, rb"Going.*2")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*1")
         self.client.logout()
 
-        response = self.client.get(reverse('meetup_finder:detail', args=[event.pk]))
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
         self.assertRegex(response.content, rb"Going.*2")
         self.assertRegex(response.content, rb"Not Going.*1")
         self.assertRegex(response.content, rb"Maybe.*1")
@@ -535,21 +534,116 @@ class EventsResponseVoteTests(TestCase):
         """
         _, event = login_and_add_event(self)
         r = event.response_set.get(response_text='Going')
-        self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]), follow=True)
+        self.client.post(reverse('meetup_finder:event_delete', args=[event.id]), follow=True)
 
         self.user = create_user_and_login(self, 'differenttestuser', '12345')
         response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id}, follow=True)
         self.assertEqual(response.status_code, 404)
 
 
-class EventsResponseDeleteTests(TestCase):
+class EventsCommentTests(TestCase):
+    def test_comment(self):
+        """
+        Check that comments are added properly
+        """
+        response, event = login_and_add_event(self)
+
+        comment_name = self.user.profile.get_name()
+        comment_text = 'Test Comment'
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': comment_text}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, comment_name)
+        self.assertContains(response, comment_text)
+
+        self.client.logout()
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, comment_name)
+        self.assertContains(response, comment_text)
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, comment_name)
+        self.assertContains(response, comment_text)
+
+        comment_name_2 = self.user.profile.get_name()
+        comment_text_2 = 'Another Comment'
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': comment_text_2}, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, comment_name)
+        self.assertContains(response, comment_text)
+        self.assertContains(response, comment_name_2)
+        self.assertContains(response, comment_text_2)
+
+        self.client.logout()
+        response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, comment_name)
+        self.assertContains(response, comment_text)
+        self.assertContains(response, comment_name_2)
+        self.assertContains(response, comment_text_2)
+
+    def test_comment_logout(self):
+        """
+        Check that logged-out users cannot comment.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]), {'comment_field': 'Test'})
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+    def test_comment_blank(self):
+        """
+        Check that a blank comment throws an error message.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': ''})
+        self.assertContains(response, "Please enter a comment.")
+
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {})
+        self.assertContains(response, "Please enter a comment.")
+
+    def test_comment_too_long(self):
+        """
+        Check that a comment that is too long throws an error message.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': 'a' * 2000})
+        self.assertContains(response, "There was an error saving your comment.")
+
+    def test_comment_no_event(self):
+        """
+        Check that an invalid/deleted event id is handled
+        """
+        _, event = login_and_add_event(self)
+        self.client.post(reverse('meetup_finder:event_delete', args=[event.id]), follow=True)
+
+        self.user = create_user_and_login(self, 'differenttestuser', '12345')
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': 'Test Comment'})
+        self.assertEqual(response.status_code, 404)
+
+
+class EventsDeleteTests(TestCase):
     def test_delete_event_auth(self):
         """
         Check that authorized user can delete event
         """
         _, event = login_and_add_event(self)
 
-        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]), follow=True)
+        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.id]), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Test Organizer")
         self.assertNotContains(response, "Test Event Name")
@@ -565,7 +659,7 @@ class EventsResponseDeleteTests(TestCase):
         self.client.logout()
         self.user = create_user_and_login(self, 'differenttestuser', '12345')
 
-        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
+        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.id]))
         self.assertEqual(response.status_code, 403)
 
     def test_delete_event_logout(self):
@@ -575,7 +669,7 @@ class EventsResponseDeleteTests(TestCase):
         _, event = login_and_add_event(self)
         self.client.logout()
 
-        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.pk]))
+        response = self.client.post(reverse('meetup_finder:event_delete', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
 
 

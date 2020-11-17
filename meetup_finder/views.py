@@ -5,7 +5,7 @@ from django.views import generic
 from django.views.decorators.http import require_http_methods
 from django.utils import timezone
 from .models import Events, Response, EventComment
-from .forms import EventForm, ProfileUpdateForm
+from .forms import EventForm, ProfileUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
@@ -19,12 +19,13 @@ class EventListView(generic.ListView):
         return Events.objects.filter(event_date__gt=timezone.now())
 
 
-def event_details(request, pk, error_message=''):
+def event_details(request, pk, error_message_vote='', error_message_comment=''):
     event = get_object_or_404(Events, pk=pk)
     return render(request, 'meetup_finder/detail.html', {
         'event': event,
         'can_delete': event.user == request.user or request.user.has_perm('meetup_finder.can_delete'),
-        'error_message': error_message,
+        'error_message_vote': error_message_vote,
+        'error_message_comment': error_message_comment,
         'is_past': event.is_past(),
     })
 
@@ -84,8 +85,19 @@ def event_delete(request, pk):
 def write_comment(request, event_id):
     event = get_object_or_404(Events, pk=event_id)
     if request.method == 'POST':
-        comment = EventComment(comment_field=request.POST["comment_field"], name=request.POST["name"], event=event)
-        comment.save()
+        form = CommentForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.instance.name = request.user.profile.get_name()
+            form.instance.event_id = event_id
+            form.save()
+        elif len(request.POST.get('comment_field', '')) == 0:
+            # Redisplay the form with an error.
+            return event_details(request, event_id,
+                                 error_message_comment="Please enter a comment.")
+        else:
+            # Redisplay the form with an error.
+            return event_details(request, event_id,
+                                 error_message_comment="There was an error saving your comment. Please try again.")
     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
 
@@ -95,9 +107,10 @@ def vote(request, event_id):
     if request.method == 'POST':
         try:
             selected_response = event.response_set.get(pk=request.POST['response'])
-        except (KeyError, Response.DoesNotExist):
-            # Redisplay the event voting form.
-            return event_details(request, event_id, "You didn't select a choice.")
+        except (KeyError, ValueError, Response.DoesNotExist):
+            # Redisplay the form with an error.
+            return event_details(request, event_id,
+                                 error_message_vote="You didn't select a choice. Please try again.")
         else:
             selected_response.votes += 1
             selected_response.save()

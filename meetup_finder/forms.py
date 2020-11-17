@@ -31,13 +31,12 @@ class EventForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
     placeholder = {
-        'name': 'Your name here',
-        'comment_field': 'Contents'
+        'comment_field': 'Leave a comment...'
     }
 
     class Meta:
         model = EventComment
-        fields = ['name', 'comment_field']
+        fields = ['comment_field']
 
 
 class ProfileUpdateForm(forms.ModelForm):

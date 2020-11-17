@@ -10,7 +10,7 @@
 			<div class="media-body">
 			  <p class="text-secondary"></p>
 			  <ul>
-				<li><b>Name</b>: {{ user.profile.full_name|default:user.username}}</li>
+				<li><b>Name</b>: {{ user.profile.get_name }}</li>
 				<li><b>Email</b>: {{ user.email }}</li>
 				{% if user.profile.bio %}
 				<li><b>Bio</b>: {{ user.profile.bio }}</li>
