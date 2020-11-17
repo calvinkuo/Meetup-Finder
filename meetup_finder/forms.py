@@ -2,7 +2,7 @@ from django import forms
 # from address.forms import AddressField
 from django_google_maps import widgets as map_widgets
 # from django_google_maps import fields as map_fields
-from .models import Events, Profile
+from .models import Events, Profile, EventComment
 
 
 class EventForm(forms.ModelForm):
@@ -28,10 +28,28 @@ class EventForm(forms.ModelForm):
             'geolocation': forms.HiddenInput(),
         }
 
+
 class EventUpdateForm(forms.ModelForm):
     class Meta:
         model = Events
         fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address']
+
+        # organizer = forms.CharField(label='Organizer', max_length= 50)
+        # name_text = forms.CharField(label='Event Name', max_length=200)
+        # comment_text = forms.CharField(label='Description', max_length=1000)
+        # address = AddressField()
+        # event_date = forms.DateField(label= 'Date of Event', widget = forms.SelectDateWidget)
+        # event_time = forms.TimeField(label= 'Event Time')
+
+
+class CommentForm(forms.ModelForm):
+    placeholder = {
+        'name' : 'Your name here',
+        'comment_field' : 'Contents'
+    }
+    class Meta:
+        model = EventComment
+        fields =['name', 'comment_field']
 
 
 class ProfileUpdateForm(forms.ModelForm):

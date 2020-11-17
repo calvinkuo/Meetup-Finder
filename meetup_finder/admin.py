@@ -3,7 +3,7 @@ from django_google_maps import widgets as map_widgets
 from django_google_maps import fields as map_fields
 from django.conf import settings
 
-from .models import Events, Response, Profile
+from .models import Events, Response, Profile, EventComment
 
 
 # class ChoiceInline(admin.TabularInline):
@@ -25,7 +25,8 @@ from .models import Events, Response, Profile
 class ResponseInline(admin.TabularInline):
     model = Response
 
-
+class CommentAdmin(admin.ModelAdmin):
+    list_display=('comment_field', 'name')
 class EventsAdmin(admin.ModelAdmin):
     inlines = [ResponseInline]
     extra = 0
@@ -37,5 +38,6 @@ class EventsAdmin(admin.ModelAdmin):
 # admin.site.register(Question, QuestionAdmin)
 # admin.site.register(Choice)
 admin.site.register(Events, EventsAdmin)
+admin.site.register(EventComment)
 admin.site.register(Profile)
 # admin.site.register(Response)
