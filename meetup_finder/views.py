@@ -47,13 +47,13 @@ class EventListView(generic.ListView):
 def writeComment(request, event_id):
     event = get_object_or_404(Events, pk=event_id)
     if request.method == 'POST':
-        comment_form = CommentForm(request.POST)
-        com = None
-        if comment_form.is_valid():
-            com = comment_form.save()
-        else:
-            comment_form = CommentForm()
-    return render(request,'index.html',{'event':event, 'comment_field':comment,'name':name,'comment_form':comment_form})
+        return render(request, 'polls/comments.html', {
+            'question': question,
+            'error_message': "You didn't enter all fields.",
+        })
+        comment = EventComment(comment_field=request.POST["comment_field"],name=request.POST["name"], event=event)
+        comment.save()
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
 
 
 

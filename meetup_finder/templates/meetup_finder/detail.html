@@ -99,13 +99,27 @@
 <div class = "row">
     <div class = "col-sm-12 col-xs-12">
         <div class = "well text-center">
-            <form method = "POST">
-                {{ form.media }}
-                {{ form|crispy }}
-                {{ comment_form.as_p }}
-                {% csrf_token %}
+            <form action="{% url 'meetup_finder:comment' event.pk %}" method = "POST">
+            {% csrf_token %}
+                <input type="text" id="name" name="name">
+                <input type="text" id="comment_field" name="comment_field">
                 <input type="submit" value = "add comment">
             </form>
+        </div>
+    </div>
+</div>
+<div class = "row">
+    <div class = "col-sm-12 col-xs-12">
+        <div class = "well text-center">
+            {% if event.EventComment_set.all %}
+            {% for comment in event.EventComment_set.all %}
+                Name:
+            {% endfor %}
+            {% else %}
+            <p>
+                No comments
+            </p>
+            {% endif %}
         </div>
     </div>
 </div>
