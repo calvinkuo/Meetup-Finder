@@ -137,7 +137,7 @@ function googleMapAdmin() {
             if (marker) {
                 self.updateMarker(latlng);
             } else {
-                self.addMarker({'latlng': latlng, 'draggable': false}); // don't allow coordinates to be changed
+                self.addMarker({'latlng': latlng, 'draggable': true});
             }
         },
 
