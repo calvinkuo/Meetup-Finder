@@ -45,6 +45,8 @@ def event_create(request):
                 post.response_set.create(response_text='Not Going', votes=0)
                 post.response_set.create(response_text='Maybe', votes=0)
                 return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
+        elif not form.data['geolocation']:
+            form.add_error('address', 'Enter a valid address.')
     else:
         form = EventForm()
 
@@ -65,6 +67,8 @@ def event_update(request, pk):
                     post = EventForm(request.POST, request.FILES, instance=event).save()
                     form.instance.user = request.user
                     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
+            elif not form.data['geolocation']:
+                form.add_error('address', 'Enter a valid address.')
         else:
             form = EventForm(instance=event)
         return render(request, 'meetup_finder/events_form.html', {'form': form})
