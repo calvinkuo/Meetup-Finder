@@ -90,12 +90,10 @@ def write_comment(request, event_id):
             form.instance.name = request.user.profile.get_name()
             form.instance.event_id = event_id
             form.save()
-        elif len(request.POST.get('comment_field', '')) == 0:
-            # Redisplay the form with an error.
+        elif len(request.POST.get('comment_field', '').strip()) == 0:  # blank comment
             return event_details(request, event_id,
                                  error_message_comment="Please enter a comment.")
-        else:
-            # Redisplay the form with an error.
+        else:  # too long or other error
             return event_details(request, event_id,
                                  error_message_comment="There was an error saving your comment. Please try again.")
     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
