@@ -120,7 +120,7 @@
 			<div class="container">
             {% for comment in event.eventcomment_set.all %}
                <div class="comment-name col-sm-3 col-xs-4 text-right"><b>{{comment.name}}</b></div>
-			   <div class="comment-text col-sm-9 col-xs-8 text-left">{{comment.comment_field}}</div>
+			   <div class="comment-text col-sm-9 col-xs-8 text-left"><p>{{comment.comment_field}}</p></div>
             {% endfor %}
 			</div>
             {% else %}
