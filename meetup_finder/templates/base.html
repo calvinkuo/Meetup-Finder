@@ -160,68 +160,68 @@
         </div>
       </div>
     </nav>
-    <div id="page-content" class="container">
-      <div class="row justify-content-center">
-        <div class="col-8">
-          
-          {% block content %}
-          {% endblock %}
+
+    <div id="page-content">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-8">
+
+            {% block content %}
+            {% endblock %}
+          </div>
         </div>
       </div>
     </div>
 
-        <!-- Footer -->
-        <footer class="page-footer font-small blue pt-4">
-        
-          <!-- Footer Links -->
-          <div class="container-fluid text-center text-md-left">
-        
-            <!-- Grid row -->
-            <div class="row">
-        
-              <!-- Grid column -->
-              <div class="col-sm-6 col-xs-12">
+    <!-- Footer -->
+    <footer class="page-footer font-small blue pt-4">
 
-                <!-- Content -->
-                <h5 class="text-uppercase">About Us</h5>
-                <p>Web Page to create events and respond to events</p>
+      <!-- Footer Links -->
+      <div class="container-fluid text-center text-md-left">
 
-              </div>
-        
-              <!-- Grid column -->
-              <div class="col-sm-6 col-xs-12">
-        
-                <!-- Links -->
-                <h5 class="text-uppercase">Links</h5>
-        
-                <ul class="list-unstyled">
-                  <li>
-                    <a href="{% url 'meetup_finder:index' %}">Find Event</a>
-                  </li>
-                  {% if user.is_authenticated %}
-                  <li>
-                    <a href="{% url 'meetup_finder:events' %}">Create Event</a>
-                  </li>
-                  {% endif %}
-              </div>
-              <!-- Grid column -->
-        
-            </div>
-            <!-- Grid row -->
-        
+        <!-- Grid row -->
+        <div class="row">
+
+          <!-- Grid column -->
+          <div class="col-sm-6 col-xs-12">
+
+            <!-- Content -->
+            <h5 class="text-uppercase">About Us</h5>
+            <p>Web Page to create events and respond to events</p>
+
           </div>
-          <!-- Footer Links -->
-        
-          <!-- Copyright -->
-          <div class="footer-copyright text-center py-3">© 2020 Copyright:
-            Calvin Kuo, Jun Song Park, Ethan Chen, Xinyuan Zhu
+
+          <!-- Grid column -->
+          <div class="col-sm-6 col-xs-12">
+
+            <!-- Links -->
+            <h5 class="text-uppercase">Links</h5>
+
+            <ul class="list-unstyled">
+              <li>
+                <a href="{% url 'meetup_finder:index' %}">Find Event</a>
+              </li>
+              {% if user.is_authenticated %}
+              <li>
+                <a href="{% url 'meetup_finder:events' %}">Create Event</a>
+              </li>
+              {% endif %}
           </div>
-          <!-- Copyright -->
-        
-        </footer>
-        <!-- Footer -->
+          <!-- Grid column -->
+
         </div>
+        <!-- Grid row -->
+
       </div>
-    </div>
+      <!-- Footer Links -->
+
+      <!-- Copyright -->
+      <div class="footer-copyright text-center py-3">© 2020 Copyright:
+        Calvin Kuo, Jun Song Park, Ethan Chen, Xinyuan Zhu
+      </div>
+      <!-- Copyright -->
+
+    </footer>
+    <!-- Footer -->
   </body>
 </html>
