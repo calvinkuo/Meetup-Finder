@@ -9,6 +9,7 @@ from .forms import EventForm, ProfileUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
+import datetime
 
 
 class EventListView(generic.ListView):
@@ -130,11 +131,13 @@ def profile(request):
     if request.method == 'POST':
         context['p_form'] = ProfileUpdateForm(request.POST, request.FILES)
         if context['p_form'].is_valid():
-            ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
-            messages.success(request, f'Your account has been updated!')
-            return HttpResponseRedirect(reverse('meetup_finder:profile'))
-        else:
-            context['show'] = True
+            if context['p_form'].instance.birthday > datetime.date.today():
+                context['p_form'].add_error('birthday', 'This date is in the future.')
+            else:
+                ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
+                messages.success(request, f'Your account has been updated!')
+                return HttpResponseRedirect(reverse('meetup_finder:profile'))
+        context['show'] = True
     else:
         context['p_form'] = ProfileUpdateForm(instance=request.user.profile)
 
