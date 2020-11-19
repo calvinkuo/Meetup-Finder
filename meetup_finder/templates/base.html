@@ -60,20 +60,20 @@
         overflow-wrap: break-word;
       }
 
-      #search-bar {
+      #search-bar, #comment-form {
         display: flex;
         gap: 1rem;
         margin-bottom: 1rem;
-      }
-      .navbar-nav > li{
-        padding-left:15px;
-        padding-right:15px;
       }
       .container {
         text-align: left;
       }
       .invalid-feedback {
         color: darkred;
+      }
+      .welcome {
+        color: white;
+        padding: 15px;
       }
     </style>
   </head>
@@ -141,7 +141,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>                        
           </button>
-          <a class="navbar-brand">PathFinder</a>
+          <a class="navbar-brand" href="{% url 'meetup_finder:index' %}">PathFinder</a>
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
           <ul class="nav navbar-nav">
@@ -149,11 +149,11 @@
             {% load socialaccount %}
             {% if user.is_authenticated %}
             <li><a href="{% url 'meetup_finder:events' %}">Create Event</a></li>
-            <p style="color:white">Welcome, {{ user.profile.get_name }} </p>
             {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
+            <li class="welcome">Welcome, {{ user.profile.get_name }}</li>
             <li><a href="{% url 'meetup_finder:profile' %}"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
             <li><a href="{% url 'account_logout' %}"><span class="glyphicon glyphicon-log-out"></span> Log Out</a></li>
             {% else %}
@@ -168,7 +168,6 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-8">
-
             {% block content %}
             {% endblock %}
           </div>
