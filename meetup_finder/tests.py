@@ -608,6 +608,10 @@ class EventsCommentTests(TestCase):
         self.assertContains(response, "Please enter a comment.")
 
         response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
+                                    {'comment_field': '          '})
+        self.assertContains(response, "Please enter a comment.")
+
+        response = self.client.post(reverse('meetup_finder:comment', args=[event.id]),
                                     {})
         self.assertContains(response, "Please enter a comment.")
 
@@ -730,6 +734,20 @@ class ProfileTests(TestCase):
         self.assertContains(response, 'I am a user from Testlandshire.')
         self.assertContains(response, 'Not a Date')
         self.assertContains(response, 'Enter a valid date.')
+
+    def test_profile_birthday_future(self):
+        """
+        Check that submitting a profile update form with a birthday in the future throws an error.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        response = self.client.post(reverse('meetup_finder:profile'),
+                         {
+                             'full_name': "Test User",
+                             'birthday': "01/01/2100",
+                         },
+                         follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This date is in the future.')
 
     def test_profile_logout(self):
         """

@@ -5,18 +5,18 @@
 
 {% block content %}
 
-<h1>Events</h1>
-<div class="row">
-	<div id="search-bar" class="col-xs-12">
-		<input type="text" class="form-control" id="filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()" value="{{ user.profile.default_filter }}">
-		<button type="button" id="clear-filter" class="btn btn-outline-info" onclick="clearFilters()">Clear filters</button>
-		<button type="button" id="sort-button" class="btn btn-outline-info" onclick="sortByDistance()">Sort by distance</button>
-	</div>
+<div id="title" class="col-xs-12">
+	<h1>Events</h1>
+</div>
+<div id="search-bar" class="col-xs-12">
+	<input type="text" class="form-control" id="filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()" value="{{ user.profile.default_filter }}">
+	<button type="button" id="clear-filter" class="btn btn-outline-info" onclick="clearFilters()">Clear filters</button>
+	<button type="button" id="sort-button" class="btn btn-outline-info" onclick="sortByDistance()">Sort by distance</button>
 </div>
 {% if event_list %}
 <div id="event-list">
 {% for event in event_list %}
-	<div data-pk="{{ event.pk }}" class="row event">
+	<div data-pk="{{ event.pk }}" class="event">
 		<div class="col-sm-3 col-xs-12">
 			<div class="well">
 				<div>

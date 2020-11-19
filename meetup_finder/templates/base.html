@@ -10,19 +10,21 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    {% load static %}
     <style>
-      /* Set black background color, white text and some padding */
       body {
-        background-image: url("https://raw.githubusercontent.com/uva-cs3240-f20/project-2-25/background/meetup_finder/templates/Savin-NY-Website-Background-Web.jpg?token=AKZUATDVSYSQUIGUNBEPIFC7XX36S");
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        min-height: 100vh;
+        background-color: #555;
+        background-image: url("{% static 'meetup_finder/Savin-NY-Website-Background-Web.jpg' %}");
         background-repeat: no-repeat;
-        background-attachment: fixed;  
+        background-attachment: fixed;
         background-size: cover;
       }
       footer {
-        position: relative;
-        left:0;
-        bottom: 0;
-        width: 100%;
+        margin-top: auto;
         background-color: #555;
         color: white;
         padding: 15px;
@@ -69,6 +71,9 @@
       }
       .container {
         text-align: left;
+      }
+      .invalid-feedback {
+        color: darkred;
       }
     </style>
   </head>
@@ -158,69 +163,68 @@
         </div>
       </div>
     </nav>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-8">
-          
-          {% block content %}
-          {% endblock %}
+
+    <div id="page-content">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-8">
+
+            {% block content %}
+            {% endblock %}
+          </div>
         </div>
       </div>
     </div>
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 
-        <!-- Footer -->
-        <footer class="page-footer font-small blue pt-4">
-        
-          <!-- Footer Links -->
-          <div class="container-fluid text-center text-md-left">
-        
-            <!-- Grid row -->
-            <div class="row">
-        
-              <!-- Grid column -->
-              <div class="col-sm-6 col-xs-12">
+    <!-- Footer -->
+    <footer class="page-footer font-small blue pt-4">
 
-                <!-- Content -->
-                <h5 class="text-uppercase">About Us</h5>
-                <p>Web Page to create events and respond to events</p>
+      <!-- Footer Links -->
+      <div class="container-fluid text-center text-md-left">
 
-              </div>
-        
-              <!-- Grid column -->
-              <div class="col-sm-6 col-xs-12">
-        
-                <!-- Links -->
-                <h5 class="text-uppercase">Links</h5>
-        
-                <ul class="list-unstyled">
-                  <li>
-                    <a href="/meetup_finder/">Find Event</a>
-                  </li>
-				  {% if user.is_authenticated %}
-                  <li>
-                    <a href="/meetup_finder/registration/">Create Event</a>
-                  </li>
-				  {% endif %}
-              </div>
-              <!-- Grid column -->
-        
-            </div>
-            <!-- Grid row -->
-        
+        <!-- Grid row -->
+        <div class="row">
+
+          <!-- Grid column -->
+          <div class="col-sm-6 col-xs-12">
+
+            <!-- Content -->
+            <h5 class="text-uppercase">About Us</h5>
+            <p>Web Page to create events and respond to events</p>
+
           </div>
-          <!-- Footer Links -->
-        
-          <!-- Copyright -->
-          <div class="footer-copyright text-center py-3">© 2020 Copyright:
-            Calvin Kuo, Jun Song Park, Ethan Chen, Xinyuan Zhu
+
+          <!-- Grid column -->
+          <div class="col-sm-6 col-xs-12">
+
+            <!-- Links -->
+            <h5 class="text-uppercase">Links</h5>
+
+            <ul class="list-unstyled">
+              <li>
+                <a href="{% url 'meetup_finder:index' %}">Find Event</a>
+              </li>
+              {% if user.is_authenticated %}
+              <li>
+                <a href="{% url 'meetup_finder:events' %}">Create Event</a>
+              </li>
+              {% endif %}
           </div>
-          <!-- Copyright -->
-        
-        </footer>
-        <!-- Footer -->
+          <!-- Grid column -->
+
         </div>
+        <!-- Grid row -->
+
       </div>
-    </div>
+      <!-- Footer Links -->
+
+      <!-- Copyright -->
+      <div class="footer-copyright text-center py-3">© 2020 Copyright:
+        Calvin Kuo, Jun Song Park, Ethan Chen, Xinyuan Zhu
+      </div>
+      <!-- Copyright -->
+
+    </footer>
+    <!-- Footer -->
   </body>
 </html>

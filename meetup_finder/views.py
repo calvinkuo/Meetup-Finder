@@ -9,6 +9,7 @@ from .forms import EventForm, ProfileUpdateForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic.edit import UpdateView
+import datetime
 
 
 class EventListView(generic.ListView):
@@ -45,6 +46,8 @@ def event_create(request):
                 post.response_set.create(response_text='Not Going', votes=0)
                 post.response_set.create(response_text='Maybe', votes=0)
                 return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
+        elif not form.data['geolocation']:
+            form.add_error('address', 'Enter a valid address.')
     else:
         form = EventForm()
 
@@ -65,6 +68,8 @@ def event_update(request, pk):
                     post = EventForm(request.POST, request.FILES, instance=event).save()
                     form.instance.user = request.user
                     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(post.pk, )))
+            elif not form.data['geolocation']:
+                form.add_error('address', 'Enter a valid address.')
         else:
             form = EventForm(instance=event)
         return render(request, 'meetup_finder/events_form.html', {'form': form})
@@ -90,12 +95,10 @@ def write_comment(request, event_id):
             form.instance.name = request.user.profile.get_name()
             form.instance.event_id = event_id
             form.save()
-        elif len(request.POST.get('comment_field', '')) == 0:
-            # Redisplay the form with an error.
+        elif len(request.POST.get('comment_field', '').strip()) == 0:  # blank comment
             return event_details(request, event_id,
                                  error_message_comment="Please enter a comment.")
-        else:
-            # Redisplay the form with an error.
+        else:  # too long or other error
             return event_details(request, event_id,
                                  error_message_comment="There was an error saving your comment. Please try again.")
     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(event_id, )))
@@ -128,11 +131,13 @@ def profile(request):
     if request.method == 'POST':
         context['p_form'] = ProfileUpdateForm(request.POST, request.FILES)
         if context['p_form'].is_valid():
-            ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
-            messages.success(request, f'Your account has been updated!')
-            return HttpResponseRedirect(reverse('meetup_finder:profile'))
-        else:
-            context['show'] = True
+            if context['p_form'].instance.birthday > datetime.date.today():
+                context['p_form'].add_error('birthday', 'This date is in the future.')
+            else:
+                ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()
+                messages.success(request, f'Your account has been updated!')
+                return HttpResponseRedirect(reverse('meetup_finder:profile'))
+        context['show'] = True
     else:
         context['p_form'] = ProfileUpdateForm(instance=request.user.profile)
 
