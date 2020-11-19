@@ -57,8 +57,8 @@
 	<div class="well text-center">
 		<form action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
 			{% csrf_token %}
-			<a class="btn btn-default" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
-			<input class="btn btn-default" type="submit" value="Delete Event">
+			<a class="btn btn-info" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
+			<input class="btn btn-info" type="submit" value="Delete Event">
 		</form>
 	</div>
 </div>
@@ -94,7 +94,7 @@
 					{% endfor %}
 						</div><br>
 			  
-						<input type="submit" value="Respond">
+						<input class="btn btn-info" type="submit" value="Respond">
 				</form>
 			</div>
 		{% else %}
@@ -121,8 +121,8 @@
 		{% if error_message_comment %}<p><strong>{{ error_message_comment }}</strong></p>{% endif %}
 		<form action="{% url 'meetup_finder:comment' event.pk %}" method="POST">
 			{% csrf_token %}
-			<input type="text" name="comment_field" placeholder="Leave a comment..." maxlength="500">
-			<input type="submit" value="Submit">
+			<input class="form-control" type="text" name="comment_field" placeholder="Leave a comment..." maxlength="500"> <br>
+			<input class="btn btn-info" type="submit" value="Submit">
 		</form>
 		{% else %}
 		<p>Log in to leave a comment.</p>

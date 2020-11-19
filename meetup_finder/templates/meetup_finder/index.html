@@ -10,8 +10,8 @@
 </div>
 <div id="search-bar" class="col-xs-12">
 	<input type="text" class="form-control" id="filter" name="Filter" placeholder="Filter events..." oninput="filterEvents()" value="{{ user.profile.default_filter }}">
-	<button type="button" id="clear-filter" class="btn btn-outline-info" onclick="clearFilters()">Clear filters</button>
-	<button type="button" id="sort-button" class="btn btn-outline-info" onclick="sortByDistance()">Sort by distance</button>
+	<button type="button" id="clear-filter" class="btn btn-info" onclick="clearFilters()">Clear filters</button>
+	<button type="button" id="sort-button" class="btn btn-info" onclick="sortByDistance()">Sort by distance</button>
 </div>
 {% if event_list %}
 <div id="event-list">
