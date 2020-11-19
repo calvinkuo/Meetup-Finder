@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-<h1>Profile</h1>
+<div id="title" class="col-xs-12">
+	<h1>Profile</h1>
+</div>
 <!-- <div class="column">
     <div class="well">
 		<div class="content-section">
@@ -37,50 +39,54 @@
 		</div>
     </div>
 </div> -->
-<div class="page-content page-container" id="page-content">
-    <div class="padding">
-        <div class="row container d-flex justify-content-left">
-            <div class="col-md-5">
-                <div class="well">
-                    <div class="card-body text-center">
-                        <div> <img src="https://static.thenounproject.com/png/558670-200.png" class="img-lg rounded-circle mb-1" alt="profile image">
-                            <h4>{{ user.profile.get_name }}</h4>
-                        </div>
-						<p class="mt-2 card-text"> {{ user.profile.bio }}</p>
-								<p><a href="#demo" class="btn btn-info" data-toggle="collapse">Update</a></p>
-					  
-								<div id="demo" class="collapse{% if show %} in{% endif %}">
-									<form method="POST" enctype="multipart/form-data">
-										{% csrf_token %}
-										<fieldset class="form-group">
-											<legend class="border-bottom mb-4">Profile Info</legend>
-											{{ p_form|crispy }}
-										</fieldset>
-										<div class="form-group">
-											<button class="btn btn-outline-info" type="submit">Submit</button>
-										</div>
-									</form>
-								</div>
-                        <div class="border-top pt-3">
-                            <div class="row">
-                                <div class="column">
-                                    <h6>4354</h6>
-                                    <p>Events Made</p>
-                                </div>
-                                <div class="column">
-                                    <h6>2</h6>
-                                    <p>Events Saved</p>
-                                </div>
-                                <div class="column">
-                                    <h6>{{ user.profile.birthday }}</h6>
-                                    <p>Birthday</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="container col-xs-12">
+	<div class="row">
+		<div class="col-md-5">
+			<h2>Your Information</h2>
+			<div class="well card-body text-center">
+				<div>
+					<img src="https://static.thenounproject.com/png/558670-200.png" class="img-lg rounded-circle mb-1" alt="profile image">
+					<h2 class="h4">{{ user.profile.get_name }}</h2>
+				</div>
+				<p class="mt-2 card-text"> {{ user.profile.bio }}</p>
+				<p><a href="#demo" class="btn btn-info" data-toggle="collapse">Update</a></p>
+		  
+				<div id="demo" class="collapse{% if show %} in{% endif %}">
+					<form method="POST" enctype="multipart/form-data">
+						{% csrf_token %}
+						<fieldset class="form-group">
+							<legend class="border-bottom mb-4">Profile Info</legend>
+							{{ p_form|crispy }}
+						</fieldset>
+						<div class="form-group">
+							<button class="btn btn-outline-info" type="submit">Submit</button>
+						</div>
+					</form>
+				</div>
+				<div class="border-top pt-3">
+					<div class="row">
+						<div class="column">
+							<b>4354</b><br>
+							<p>Events Made</p>
+						</div>
+						<div class="column">
+							<b>2</b><br>
+							<p>Events Saved</p>
+						</div>
+						<div class="column">
+							<b>{{ user.profile.birthday }}</b><br>
+							<p>Birthday</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-    </div>
+		<div class="col-md-7">
+			<h2>Your Events</h2>
+			<div class="well card-body text-center">
+				
+			</div>
+		</div>
+	</div>
 </div>
 {% endblock content %}
