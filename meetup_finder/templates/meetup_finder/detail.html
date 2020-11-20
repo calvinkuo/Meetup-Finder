@@ -17,20 +17,20 @@
 
 <div class="col-sm-12">
 	<div class="col-xs-12 well text-center">
-		<div class="col-sm-4 col-xs-12">
+		<div id="event-details" class="col-sm-4 col-xs-12">
 			<div class="col-sm-12 col-xs-6">
 				<b>Hosted By</b>
-				<p id="organizer">{{ event.organizer }}</p>
+				<p class="event-organizer">{{ event.organizer }}</p>
 			</div>
 
 			<div class="col-sm-12 col-xs-6">
 				<b>Date &amp; Time</b>
-				<p><span id="event_date">{{ event.event_date }}</span> at <span id="event_time">{{ event.event_time }}</span></p>
+				<p><span class="event-date">{{ event.event_date }} at {{ event.event_time }}</span></p>
 			</div>
 
-			<div class="col-xs-12">
+			<div class="col-sm-12 col-xs-12">
 				<b>Location</b>
-				<p id="address" data-geolocation="{{ event.geolocation }}">{{ event.address }}<span id="distance"></span></p>
+				<p class="event-address" data-geolocation="{{ event.geolocation }}">{{ event.address }}<span id="distance" class="event-distance"></span></p>
 			</div>
 		</div>
 
@@ -43,46 +43,42 @@
 				&center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
 			</iframe>
 		</div>
+		
+		{% if can_delete %}
+		<form id="event-modify" class="col-xs-12" action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
+			{% csrf_token %}
+			<a class="btn btn-info" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
+			<input class="btn btn-info" type="submit" value="Delete Event">
+		</form>
+		{% endif %}
 	</div>
 </div>
 
+<div class="col-xs-12">
+	<h2>Details</h2>
+</div>
 <div class="col-sm-12">
 	<div id="comment" class="col-xs-12 well text-center">
 		{{ event.comment }}
 	</div>
 </div>
 
-{% if can_delete %}
-<div class="col-xs-12">
-	<div class="well text-center">
-		<form action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
-			{% csrf_token %}
-			<a class="btn btn-info" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
-			<input class="btn btn-info" type="submit" value="Delete Event">
-		</form>
-	</div>
-</div>
-{% endif %}
-
 <div class="col-xs-12">
 	<h2>Comments</h2>
 </div>
 <div class="col-xs-12">
 	<div class="col-xs-12 well text-center">
-		<div class="col-sm-6 col-xs-6">
-			<div class="text-left" style="display: inline-block; margin-left: -1em">
-				<ul style="margin-bottom: -5px;">
-					{% for response in event.response_set.all %}
-					<li style="margin-bottom: 5px;"><b>{{ response.response_text }}</b> -- {{ response.votes }} vote{{ response.votes|pluralize }}</li>
-					{% endfor %}
-				</ul>
-			</div>
+		<div id="event-reponses" class="col-xs-6">
+			{% for response in event.response_set.all %}
+			<div class="text-right"><b>{{ response.response_text }}</b></div>
+			<div class="text-left">{{ response.votes }} vote{{ response.votes|pluralize }}</div>
+			{% endfor %}
 		</div>
 
 		{% if error_message_vote %}<p><strong>{{ error_message_vote }}</strong></p>{% endif %}
 
 		{% if user.is_authenticated %}
-			<div class="col-sm-6 col-xs-6">
+			<div class="col-xs-6">
 				<form action="{% url 'meetup_finder:vote' event.pk %}" method="POST">
 					{% csrf_token %}
 						<div class="text-left" style="display: inline-block; margin-left: -1em">
@@ -98,7 +94,7 @@
 				</form>
 			</div>
 		{% else %}
-			<div class="col-sm-6 col-xs-6">
+			<div class="col-xs-6">
 				Log in to respond to this event.
 			</div>
 		{% endif %}

@@ -29,6 +29,62 @@
         color: white;
         padding: 15px;
       }
+      .container {
+        text-align: left;
+      }
+      .welcome {
+        color: white;
+        padding: 15px;
+      }
+	  
+	  /* HOME PAGE */
+	  ul.event-title {
+		margin-bottom: 0;
+	  }
+	  #event-list .event-name {
+		font-weight: bold;
+		font-size: 120%;
+	  }
+	  #event-list .event-date {
+		text-transform: uppercase;
+		font-weight: bold;
+		color: crimson;
+	  }
+	  #event-list .event-address, #event-list .event-distance {
+		color: gray;
+	  }
+      iframe.map {
+        display: block;
+        margin: auto;
+        max-width: 100%;
+      }
+      #search-bar, #comment-form {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+	  
+	  /* EVENT DETAILS PAGE */
+	  #event-details .event-date {
+		color: crimson;
+	  }
+	  #event-details .event-address, #event-list .event-distance {
+		color: gray;
+	  }
+	  #event-reponses {
+		display: grid;
+		grid-template-columns: 50% 50%;
+		column-gap: 30px;
+		row-gap: 10px;
+	  }
+	  #event-modify {
+		margin-top: 15px;
+	  }
+      .comment-name, .comment-text {
+        overflow-wrap: break-word;
+      }
+	  
+	  /* PROFILE PAGE */
       #profile-data {
         display: flex;
       }
@@ -36,47 +92,26 @@
         flex: 1;
         padding: 10px;
       }
-
       /* Clear floats after the columns */
       .row:after {
         content: "";
         display: table;
         clear: both;
       }
+	  
+	  /* CREATE EVENT FORM */
       #div_id_address #id_address {
         width: 100%;
       }
-
       #div_id_address .map_canvas_wrapper {
         margin-left: 0;
         margin-top: 15px;
       }
-
-      iframe.map {
-        display: block;
-        margin: auto;
-        max-width: 100%;
-      }
-
-      .comment-name, .comment-text {
-        overflow-wrap: break-word;
-      }
-
-      #search-bar, #comment-form {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1rem;
-      }
-      .container {
-        text-align: left;
-      }
       .invalid-feedback {
         color: darkred;
       }
-      .welcome {
-        color: white;
-        padding: 15px;
-      }
+
+
     </style>
   </head>
   <body>

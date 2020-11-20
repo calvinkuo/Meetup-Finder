@@ -17,23 +17,21 @@
 <div id="event-list">
 {% for event in event_list %}
 	<div data-pk="{{ event.pk }}" class="event">
-		<div class="col-sm-3 col-xs-12">
+		<div class="col-md-3 col-sm-4 col-xs-12">
 			<div class="well">
-				<div>
-					<b><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></b>
-				</div>
-				<div>
-					<span id="distance-{{ event.pk }}" class="distance"></span>
-				</div>
+				<ul class="event-title list-unstyled">
+					<li class="event-name"><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></li>
+					<li class="event-organizer">{{ event.organizer }}</li>
+					<li class="event-distance" id="distance-{{ event.pk }}"></li>
+				</ul>
 			</div>
 		</div>
-		<div class="col-sm-9 col-xs-12">
+		<div class="col-md-9 col-sm-8 col-xs-12">
 			<div class="well">
-				<ul>
-					<li>Organizer: {{ event.organizer }}</li>
-					<li>Details: {{ event.comment }}</li>
-					<li>Address: {{ event.address }}</li>
-					<li>Date: {{ event.event_date }}</li>
+				<ul class="list-unstyled">
+					<li class="event-date">{{ event.event_date }} at {{ event.event_time }}</li>
+					<li class="event-address">{{ event.address }}</li>
+					<li class="event-details">{{ event.comment }}</li>
 				</ul>
 				<div class="map_container">
 					<iframe class="map"
@@ -98,7 +96,7 @@ function sortByDistanceCallback(pos) {
 			var eventLong = coordinates[event].split(',')[1];
 			var distance = getDistanceBetween(myLat, myLong, eventLat, eventLong);
 			distances[event] = distance;
-			$("#distance-" + event).html(distance.toFixed(1) + " mi");
+			$("#distance-" + event).html("(" + distance.toFixed(1) + " mi away)");
 		}
 	}
 	
