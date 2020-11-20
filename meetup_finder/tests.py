@@ -735,6 +735,20 @@ class ProfileTests(TestCase):
         self.assertContains(response, 'Not a Date')
         self.assertContains(response, 'Enter a valid date.')
 
+    def test_profile_birthday_none(self):
+        """
+        Check that submitting a profile update form without a birthday submits properly.
+        """
+        self.user = create_user_and_login(self, 'testuser', '12345')
+        response = self.client.post(reverse('meetup_finder:profile'),
+                         {
+                             'full_name': "Test User",
+                             'birthday': "",
+                         },
+                         follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, '<p>Birthday</p>')
+
     def test_profile_birthday_future(self):
         """
         Check that submitting a profile update form with a birthday in the future throws an error.

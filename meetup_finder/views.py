@@ -131,7 +131,8 @@ def profile(request):
     if request.method == 'POST':
         context['p_form'] = ProfileUpdateForm(request.POST, request.FILES)
         if context['p_form'].is_valid():
-            if context['p_form'].instance.birthday > datetime.date.today():
+            if context['p_form'].instance.birthday is not None and \
+               context['p_form'].instance.birthday > datetime.date.today():
                 context['p_form'].add_error('birthday', 'This date is in the future.')
             else:
                 ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile).save()

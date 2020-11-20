@@ -64,7 +64,7 @@
 					</form>
 				</div>
 				<div class="border-top pt-3">
-					<div class="row">
+					<div id="profile-data" class="row">
 						<div class="column">
 							<b>4354</b><br>
 							<p>Events Made</p>
@@ -73,10 +73,12 @@
 							<b>2</b><br>
 							<p>Events Saved</p>
 						</div>
+						{% if user.profile.birthday %}
 						<div class="column">
 							<b>{{ user.profile.birthday }}</b><br>
 							<p>Birthday</p>
 						</div>
+						{% endif %}
 					</div>
 				</div>
 			</div>
