@@ -56,3 +56,6 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['full_name', 'bio', 'birthday', 'default_filter']
+        widgets = {
+            'birthday': DateInput(),
+        }
