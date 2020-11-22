@@ -4,7 +4,11 @@ from django_google_maps import widgets as map_widgets
 # from django_google_maps import fields as map_fields
 from .models import Events, Profile, EventComment
 
+class DateInput(forms.DateInput):
+    input_type = 'date'
 
+class TimeInput(forms.TimeInput):
+    input_type = 'time'
 class EventForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,6 +28,8 @@ class EventForm(forms.ModelForm):
         model = Events
         fields = ['organizer', 'name', 'comment', 'event_date', 'event_time', 'address', 'geolocation']
         widgets = {
+            'event_date' : DateInput(),
+            'event_time' : TimeInput(),
             'address': map_widgets.GoogleMapsAddressWidget(attrs={'data-map-type': 'roadmap'}),
             'geolocation': forms.HiddenInput(),
         }
