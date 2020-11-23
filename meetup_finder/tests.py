@@ -774,6 +774,75 @@ class ProfileTests(TestCase):
         self.assertEqual(response.status_code, 302)  # redirect to login
 
 
+class ProfileAddRemoveEventTests(TestCase):
+    def test_event_add(self):
+        """
+        Check event_add
+        """
+        _, event = login_and_add_event(self)
+        self.assertFalse(event in self.user.profile.events.all())
+
+        response = self.client.post(reverse('meetup_finder:event_add', args=[event.id]), follow=True)
+        self.assertTrue(event in self.user.profile.events.all())
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Add Event")
+        self.assertContains(response, "Remove Event")
+
+        response = self.client.get(reverse('meetup_finder:profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test Organizer")
+        self.assertContains(response, "Test Event Name")
+
+    def test_event_remove(self):
+        """
+        Check event_remove
+        """
+        _, event = login_and_add_event(self)
+        _ = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
+        self.assertTrue(event in self.user.profile.events.all())
+
+        response = self.client.post(reverse('meetup_finder:event_remove', args=[event.id]), follow=True)
+        self.assertFalse(event in self.user.profile.events.all())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Add Event")
+        self.assertNotContains(response, "Remove Event")
+
+        response = self.client.get(reverse('meetup_finder:profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Test Organizer")
+        self.assertNotContains(response, "Test Event Name")
+
+    def test_profile_event_remove(self):
+        """
+        Check profile_event_remove
+        """
+        _, event = login_and_add_event(self)
+        _ = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
+        self.assertTrue(event in self.user.profile.events.all())
+
+        response = self.client.post(reverse('meetup_finder:profile_event_remove', args=[event.id]), follow=True)
+        self.assertFalse(event in self.user.profile.events.all())
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Test Organizer")
+        self.assertNotContains(response, "Test Event Name")
+
+    def test_profile_event_logout(self):
+        """
+        Check that logged-out users cannot add/remove events.
+        """
+        _, event = login_and_add_event(self)
+        self.client.logout()
+
+        response = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+        response = self.client.post(reverse('meetup_finder:event_remove', args=[event.id]))
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+        response = self.client.post(reverse('meetup_finder:profile_event_remove', args=[event.id]))
+        self.assertEqual(response.status_code, 302)  # redirect to login
+
+
 class ThirdPartyTests(TestCase):
     """
     Tests to ensure none of the third-party libraries break due to any changes in settings.py, the DB, etc.

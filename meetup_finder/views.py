@@ -86,17 +86,22 @@ def event_delete(request, pk):
         return HttpResponseRedirect(reverse('meetup_finder:index'))  # Redirect to the homepage.
     return HttpResponseForbidden()
 
+
 @login_required
+@require_http_methods(["POST"])
 def event_add(request, pk):
     event = get_object_or_404(Events, pk=pk)
     request.user.profile.events.add(event)
     return HttpResponseRedirect(reverse('meetup_finder:detail', args=(pk, )))
 
+
 @login_required
+@require_http_methods(["POST"])
 def event_remove(request, pk):
     event = get_object_or_404(Events, pk=pk)
     request.user.profile.events.remove(event)
-    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(pk,)))
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(pk, )))
+
 
 @login_required
 def write_comment(request, event_id):
@@ -156,7 +161,9 @@ def profile(request):
 
     return render(request, 'meetup_finder/profile.html', context)
 
+
 @login_required
+@require_http_methods(["POST"])
 def profile_event_remove(request, pk):
     event = get_object_or_404(Events, pk=pk)
     request.user.profile.events.remove(event)
