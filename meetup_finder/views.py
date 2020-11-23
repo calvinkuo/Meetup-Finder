@@ -28,6 +28,7 @@ def event_details(request, pk, error_message_vote='', error_message_comment=''):
         'error_message_vote': error_message_vote,
         'error_message_comment': error_message_comment,
         'is_past': event.is_past(),
+        'added': event.profile_set.filter(id = request.user.profile.id)
     })
 
 
@@ -85,6 +86,17 @@ def event_delete(request, pk):
         return HttpResponseRedirect(reverse('meetup_finder:index'))  # Redirect to the homepage.
     return HttpResponseForbidden()
 
+@login_required
+def event_add(request, pk):
+    event = get_object_or_404(Events, pk=pk)
+    request.user.profile.events.add(event)
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(pk, )))
+
+@login_required
+def event_remove(request, pk):
+    event = get_object_or_404(Events, pk=pk)
+    request.user.profile.events.remove(event)
+    return HttpResponseRedirect(reverse('meetup_finder:detail', args=(pk,)))
 
 @login_required
 def write_comment(request, event_id):
@@ -143,3 +155,9 @@ def profile(request):
         context['p_form'] = ProfileUpdateForm(instance=request.user.profile)
 
     return render(request, 'meetup_finder/profile.html', context)
+
+@login_required
+def profile_event_remove(request, pk):
+    event = get_object_or_404(Events, pk=pk)
+    request.user.profile.events.remove(event)
+    return HttpResponseRedirect(reverse('meetup_finder:profile'))

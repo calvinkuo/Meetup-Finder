@@ -16,8 +16,8 @@ class EventForm(forms.ModelForm):
             'organizer': 'Enter the group or person hosting this event',
             'name': 'Enter a title',
             'comment': 'Enter a description',
-            'event_date': 'Enter a date',
-            'event_time': 'Enter a time',
+            'event_date': 'Enter a date (YYYY-MM-DD)',
+            'event_time': 'Enter a time (HH:MM)',
             'address': 'Enter a location',
             'geolocation': '',
         }
@@ -47,7 +47,7 @@ class ProfileUpdateForm(forms.ModelForm):
         placeholder = {
             'full_name': 'Your name',
             'bio': 'A short description of yourself',
-            'birthday': 'Your birthday',
+            'birthday': 'YYYY-MM-DD',
             'default_filter': 'Keywords to use as your default home page (separate terms with commas)',
         }
         for name, value in self.fields.items():
