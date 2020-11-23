@@ -91,25 +91,20 @@
 			<h2>Your Events</h2>
 			<div class="well card-body text-left">
 			{% if user.profile.events.all %}
-			<div id="event-list">
-			{% for event in user.profile.events.all %}
-				<div data-pk="{{ event.pk }}" class="event">
-					<div id="profile-events">
-						<div class="well">
-							<ul class="event-title list-unstyled">
-								<li class="event-name"><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></li>
-								<li class="event-organizer">{{ event.organizer }}</li>
-								<li class="event-distance" id="distance-{{ event.pk }}"></li>
-							</ul>
-							<form id="event-remove" class="lol" action="{% url 'meetup_finder:profile_event_remove' event.pk %}" method="POST">
-								{% csrf_token %}
-								<input class="btn btn-info" type="submit" value="Remove Event">
-							</form>
-						</div>
+				<div id="event-list">
+					<div id="inline-event-list">
+					{% for event in user.profile.events.all %}
+						<ul class="event-title list-unstyled">
+							<li class="event-name"><a href="{% url 'meetup_finder:detail' event.pk %}">{{ event.name }}</a></li>
+							<li class="event-organizer">{{ event.organizer }}</li>
+						</ul>
+						<form class="event-remove" action="{% url 'meetup_finder:profile_event_remove' event.pk %}" method="POST">
+							{% csrf_token %}
+							<input class="btn btn-info" type="submit" value="Remove Event">
+						</form>
+					{% endfor %}
 					</div>
 				</div>
-			{% endfor %}
-			</div>
 			{% else %}
 				<p>You currently have no events.</p>
 			{% endif %}				

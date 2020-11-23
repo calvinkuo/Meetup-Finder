@@ -80,8 +80,15 @@ iframe.map {
 	row-gap: 10px;
 }
 
-#event-modify {
-	margin-top: 15px;
+#event-actions {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 1rem;
+}
+
+.spacer {
+	margin-bottom: 15px;
 }
 
 .comment-name, .comment-text {
@@ -106,6 +113,18 @@ iframe.map {
 	content: "";
 	display: table;
 	clear: both;
+}
+
+#inline-event-list {
+	display: grid;
+	grid-template-columns: auto auto;
+	column-gap: 30px;
+	row-gap: 10px;
+	align-items: center;
+}
+
+.event-remove {
+	justify-self: right;
 }
 
 /***************************************************************************************
