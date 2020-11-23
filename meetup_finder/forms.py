@@ -41,7 +41,7 @@ class ProfileUpdateForm(forms.ModelForm):
         placeholder = {
             'full_name': 'Your name',
             'bio': 'A short description of yourself',
-            'birthday': 'Your birthday',
+            'birthday': 'YYYY-MM-DD',
             'default_filter': 'Keywords to use as your default home page (separate terms with commas)',
         }
         for name, value in self.fields.items():

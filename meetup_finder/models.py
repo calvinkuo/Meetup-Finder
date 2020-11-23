@@ -64,6 +64,8 @@ class Profile(models.Model):
     birthday = models.DateField("Birthday", null=True, blank=True)
     default_filter = models.CharField("Default Search Filter", max_length=500, blank=True)
 
+    events = models.ManyToManyField(Events)
+
     def __str__(self):
         return f'{self.user.username} Profile'
 

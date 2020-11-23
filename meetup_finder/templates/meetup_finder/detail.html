@@ -44,6 +44,20 @@
 			</iframe>
 		</div>
 		
+		{% if not added %}
+		<form id="event-add" class="col-xs-12" action="{% url 'meetup_finder:event_add' event.pk %}" method="POST">
+			{% csrf_token %}
+			<input class="btn btn-info" type="submit" value="Add Event">
+		</form>
+		{% endif %}
+		
+		{% if added %}
+		<form id="event-add" class="col-xs-12" action="{% url 'meetup_finder:event_remove' event.pk %}" method="POST">
+			{% csrf_token %}
+			<input class="btn btn-info" type="submit" value="Remove Event">
+		</form>
+		{% endif %}
+		
 		{% if can_delete %}
 		<form id="event-modify" class="col-xs-12" action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
 			{% csrf_token %}
