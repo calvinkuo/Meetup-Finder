@@ -32,6 +32,32 @@
 				<b>Location</b>
 				<p class="event-address" data-geolocation="{{ event.geolocation }}">{{ event.address }}<span id="distance" class="event-distance"></span></p>
 			</div>
+			
+			<div class="col-sm-12 col-xs-6">
+				{% if not added %}
+				<form id="event-add" action="{% url 'meetup_finder:event_add' event.pk %}" method="POST">
+					{% csrf_token %}
+					<input class="btn btn-info" type="submit" value="Add Event">
+				</form>
+				{% endif %}
+				
+				{% if added %}
+				<form id="event-remove" action="{% url 'meetup_finder:event_remove' event.pk %}" method="POST">
+					{% csrf_token %}
+					<input class="btn btn-info" type="submit" value="Remove Event">
+				</form>
+				{% endif %}
+			</div>
+			
+			<div class="col-sm-12 col-xs-6">
+				{% if can_delete %}
+				<form id="event-modify" action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
+					{% csrf_token %}
+					<a class="btn btn-info" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
+					<input class="btn btn-info" type="submit" value="Delete Event">
+				</form>
+				{% endif %}
+			</div>	
 		</div>
 
 		<div class="col-sm-8 col-xs-12 map_container">
@@ -43,28 +69,6 @@
 				&center={{ event.geolocation }}&q={{ event.address }}" allowfullscreen>
 			</iframe>
 		</div>
-		
-		{% if not added %}
-		<form id="event-add" class="col-xs-12" action="{% url 'meetup_finder:event_add' event.pk %}" method="POST">
-			{% csrf_token %}
-			<input class="btn btn-info" type="submit" value="Add Event">
-		</form>
-		{% endif %}
-		
-		{% if added %}
-		<form id="event-add" class="col-xs-12" action="{% url 'meetup_finder:event_remove' event.pk %}" method="POST">
-			{% csrf_token %}
-			<input class="btn btn-info" type="submit" value="Remove Event">
-		</form>
-		{% endif %}
-		
-		{% if can_delete %}
-		<form id="event-modify" class="col-xs-12" action="{% url 'meetup_finder:event_delete' event.pk %}" method="POST">
-			{% csrf_token %}
-			<a class="btn btn-info" href="{% url 'meetup_finder:update' event.pk %}">Edit Event</a>
-			<input class="btn btn-info" type="submit" value="Delete Event">
-		</form>
-		{% endif %}
 	</div>
 </div>
 

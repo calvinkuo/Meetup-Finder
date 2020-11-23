@@ -101,6 +101,10 @@
 								<li class="event-organizer">{{ event.organizer }}</li>
 								<li class="event-distance" id="distance-{{ event.pk }}"></li>
 							</ul>
+							<form id="event-remove" class="lol" action="{% url 'meetup_finder:profile_event_remove' event.pk %}" method="POST">
+								{% csrf_token %}
+								<input class="btn btn-info" type="submit" value="Remove Event">
+							</form>
 						</div>
 					</div>
 				</div>

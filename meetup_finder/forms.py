@@ -12,8 +12,8 @@ class EventForm(forms.ModelForm):
             'organizer': 'Enter the group or person hosting this event',
             'name': 'Enter a title',
             'comment': 'Enter a description',
-            'event_date': 'Enter a date',
-            'event_time': 'Enter a time',
+            'event_date': 'Enter a date (YYYY-MM-DD)',
+            'event_time': 'Enter a time (HH:MM)',
             'address': 'Enter a location',
             'geolocation': '',
         }
