@@ -28,7 +28,7 @@ def event_details(request, pk, error_message_vote='', error_message_comment=''):
         'error_message_vote': error_message_vote,
         'error_message_comment': error_message_comment,
         'is_past': event.is_past(),
-        'added': event.profile_set.filter(id = request.user.profile.id)
+        'added': not request.user.is_anonymous and event.profile_set.filter(id = request.user.profile.id)
     })
 
 
