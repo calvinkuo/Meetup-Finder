@@ -189,6 +189,7 @@ class EventsCreateViewTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:events'))  # event creation
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
     def test_event_form_logout_post(self):
         """
@@ -199,6 +200,7 @@ class EventsCreateViewTests(TestCase):
 
         response, _ = login_and_add_event(self, login=False, follow=False)
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
         response = self.client.get(reverse('meetup_finder:index'))
         self.assertEqual(response.status_code, 200)
@@ -307,6 +309,7 @@ class EventsEditViewTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:update', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
     def test_event_edit_form_logout_post(self):
         """
@@ -317,6 +320,7 @@ class EventsEditViewTests(TestCase):
 
         response, event = update_event(self, event, follow=False)
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
         # check event not modified
         response = self.client.get(reverse('meetup_finder:detail', args=[event.id]))
@@ -483,6 +487,7 @@ class EventsResponseVoteTests(TestCase):
         r = event.response_set.get(response_text='Going')
         response = self.client.post(reverse('meetup_finder:vote', args=[event.id]), {'response': r.id})
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
     def test_response_vote_invalid(self):
         """
@@ -594,6 +599,7 @@ class EventsCommentTests(TestCase):
         self.client.logout()
         response = self.client.post(reverse('meetup_finder:comment', args=[event.id]), {'comment_field': 'Test'})
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
     def test_comment_blank(self):
         """
@@ -675,6 +681,7 @@ class EventsDeleteTests(TestCase):
 
         response = self.client.post(reverse('meetup_finder:event_delete', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
 
 class ProfileTests(TestCase):
@@ -772,6 +779,7 @@ class ProfileTests(TestCase):
 
         response = self.client.get(reverse('meetup_finder:profile'))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
 
 class ProfileAddRemoveEventTests(TestCase):
@@ -780,10 +788,10 @@ class ProfileAddRemoveEventTests(TestCase):
         Check event_add
         """
         _, event = login_and_add_event(self)
-        self.assertFalse(event in self.user.profile.events.all())
+        self.assertNotIn(event, self.user.profile.events.all())
 
         response = self.client.post(reverse('meetup_finder:event_add', args=[event.id]), follow=True)
-        self.assertTrue(event in self.user.profile.events.all())
+        self.assertIn(event, self.user.profile.events.all())
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Add Event")
         self.assertContains(response, "Remove Event")
@@ -799,10 +807,10 @@ class ProfileAddRemoveEventTests(TestCase):
         """
         _, event = login_and_add_event(self)
         _ = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
-        self.assertTrue(event in self.user.profile.events.all())
+        self.assertIn(event, self.user.profile.events.all())
 
         response = self.client.post(reverse('meetup_finder:event_remove', args=[event.id]), follow=True)
-        self.assertFalse(event in self.user.profile.events.all())
+        self.assertNotIn(event, self.user.profile.events.all())
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Add Event")
         self.assertNotContains(response, "Remove Event")
@@ -818,10 +826,10 @@ class ProfileAddRemoveEventTests(TestCase):
         """
         _, event = login_and_add_event(self)
         _ = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
-        self.assertTrue(event in self.user.profile.events.all())
+        self.assertIn(event, self.user.profile.events.all())
 
         response = self.client.post(reverse('meetup_finder:profile_event_remove', args=[event.id]), follow=True)
-        self.assertFalse(event in self.user.profile.events.all())
+        self.assertNotIn(event, self.user.profile.events.all())
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "Test Organizer")
         self.assertNotContains(response, "Test Event Name")
@@ -835,12 +843,15 @@ class ProfileAddRemoveEventTests(TestCase):
 
         response = self.client.post(reverse('meetup_finder:event_add', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
         response = self.client.post(reverse('meetup_finder:event_remove', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
         response = self.client.post(reverse('meetup_finder:profile_event_remove', args=[event.id]))
         self.assertEqual(response.status_code, 302)  # redirect to login
+        self.assertIn(reverse('account_login'), response['Location'])
 
 
 class ThirdPartyTests(TestCase):
